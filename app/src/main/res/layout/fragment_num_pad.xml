@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app2="http://schemas.android.com/apk/res-auto"
+    >
+
+    <data>
+        <variable
+            name="viewmodel"
+            type="de.wpavelev.scorecounter2.viewmodels.MainViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/main_background">
+
+        <ImageButton
+            android:id="@+id/swap"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:adjustViewBounds="false"
+            android:background="@color/num_pad_button_background"
+            android:contentDescription="Swap Player"
+            android:padding="@dimen/num_pad_image_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/swap_icon1"
+            app2:layout_constraintBottom_toBottomOf="@+id/b7"
+            app2:layout_constraintEnd_toEndOf="parent"
+            app2:layout_constraintHorizontal_bias="0.5"
+            app2:layout_constraintStart_toEndOf="@+id/b9"
+            app2:layout_constraintTop_toTopOf="@+id/b7" />
+
+        <ImageButton
+            android:id="@+id/backButton"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:contentDescription="Back"
+
+            android:padding="@dimen/num_pad_image_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/back_icon_50"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b6"
+            app2:layout_constraintEnd_toEndOf="@+id/swap"
+            app2:layout_constraintStart_toStartOf="@+id/swap"
+            app2:layout_constraintTop_toTopOf="@+id/b6" />
+
+        <ImageButton
+            android:id="@+id/button"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:contentDescription="Ok"
+
+            android:onClick="@{()->viewmodel.onClickSubmit()}"
+            android:padding="@dimen/num_pad_image_button_padding"
+            android:scaleType="centerInside"
+            android:src="@drawable/ok_green"
+
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b3"
+            app2:layout_constraintEnd_toEndOf="@+id/backButton"
+            app2:layout_constraintStart_toStartOf="@+id/backButton"
+            app2:layout_constraintTop_toTopOf="@+id/b3" />
+
+        <Button
+            android:id="@+id/quirkle"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:text="+12"
+            app2:layout_constraintBottom_toBottomOf="@+id/placeholderbutton2"
+            app2:layout_constraintEnd_toEndOf="@+id/button"
+            app2:layout_constraintStart_toStartOf="@+id/button"
+            app2:layout_constraintTop_toTopOf="@+id/placeholderbutton2" />
+
+        <Button
+            android:id="@+id/placeholderbutton1"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            app2:layout_constraintBottom_toBottomOf="parent"
+            app2:layout_constraintEnd_toEndOf="@+id/b1"
+            app2:layout_constraintStart_toStartOf="@+id/b1"
+            app2:layout_constraintTop_toBottomOf="@+id/b1" />
+
+        <Button
+            android:id="@+id/placeholderbutton2"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            app2:layout_constraintBottom_toBottomOf="@+id/b0"
+            app2:layout_constraintEnd_toEndOf="@+id/b3"
+            app2:layout_constraintStart_toStartOf="@+id/b3"
+            app2:layout_constraintTop_toTopOf="@+id/b0" />
+
+        <Button
+            android:id="@+id/b0"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(0)}"
+            android:text="0"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/placeholderbutton1"
+            app2:layout_constraintEnd_toEndOf="@+id/b2"
+
+            app2:layout_constraintStart_toStartOf="@+id/b2"
+            app2:layout_constraintTop_toTopOf="@+id/placeholderbutton1" />
+
+        <Button
+            android:id="@+id/b8"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+
+            android:onClick="@{()->viewmodel.onClickDigit(8)}"
+            android:text="8"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b7"
+            app2:layout_constraintEnd_toStartOf="@+id/b9"
+            app2:layout_constraintHorizontal_bias="0.5"
+            app2:layout_constraintStart_toEndOf="@+id/b7"
+            app2:layout_constraintTop_toTopOf="@+id/b7" />
+
+        <Button
+            android:id="@+id/b2"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+
+            android:onClick="@{()->viewmodel.onClickDigit(2)}"
+            android:text="2"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b1"
+            app2:layout_constraintEnd_toEndOf="@+id/b5"
+            app2:layout_constraintStart_toStartOf="@+id/b5"
+            app2:layout_constraintTop_toTopOf="@+id/b1" />
+
+        <Button
+            android:id="@+id/b9"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_column="2"
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(9)}"
+            android:text="9"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b7"
+            app2:layout_constraintEnd_toStartOf="@+id/swap"
+            app2:layout_constraintHorizontal_bias="0.5"
+            app2:layout_constraintStart_toEndOf="@+id/b8"
+            app2:layout_constraintTop_toTopOf="@+id/b7" />
+
+        <Button
+            android:id="@+id/b4"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(4)}"
+            android:text="4"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toTopOf="@+id/b1"
+            app2:layout_constraintEnd_toEndOf="@+id/b7"
+            app2:layout_constraintStart_toStartOf="@+id/b7"
+            app2:layout_constraintTop_toBottomOf="@+id/b7" />
+
+        <Button
+            android:id="@+id/b6"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(6)}"
+            android:text="6"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b5"
+            app2:layout_constraintEnd_toEndOf="@+id/b9"
+            app2:layout_constraintStart_toStartOf="@+id/b9"
+            app2:layout_constraintTop_toTopOf="@+id/b5" />
+
+        <Button
+            android:id="@+id/b1"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(1)}"
+            android:text="1"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toTopOf="@+id/placeholderbutton1"
+            app2:layout_constraintEnd_toEndOf="@+id/b4"
+            app2:layout_constraintStart_toStartOf="@+id/b4"
+            app2:layout_constraintTop_toBottomOf="@+id/b4" />
+
+        <Button
+            android:id="@+id/b7"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(7)}"
+            android:text="7"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toTopOf="@+id/b4"
+            app2:layout_constraintEnd_toStartOf="@+id/b8"
+            app2:layout_constraintHorizontal_bias="0.5"
+            app2:layout_constraintStart_toStartOf="parent"
+            app2:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/b5"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_column="1"
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(5)}"
+            android:text="5"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b4"
+            app2:layout_constraintEnd_toEndOf="@+id/b8"
+            app2:layout_constraintStart_toStartOf="@+id/b8"
+            app2:layout_constraintTop_toTopOf="@+id/b4" />
+
+        <Button
+            android:id="@+id/b3"
+            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/num_pad_button_background"
+            android:onClick="@{()->viewmodel.onClickDigit(3)}"
+            android:text="3"
+            android:textSize="@dimen/square_button_text_size"
+            app2:layout_constraintBottom_toBottomOf="@+id/b2"
+            app2:layout_constraintEnd_toEndOf="@+id/b6"
+            app2:layout_constraintStart_toStartOf="@+id/b6"
+            app2:layout_constraintTop_toTopOf="@+id/b2" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

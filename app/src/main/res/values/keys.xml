@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="key_player_limit" >KEY_PLAYER_LIMIT</string>
+    <integer name="default_value_player_limit">4</integer>
+
+    <string name="key_acitve_player">KEY_ACITVE_PLAYER</string>
+    <integer name="default_value_acitve_player">0</integer>
+
+</resources>

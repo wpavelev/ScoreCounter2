@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+
+    <dimen name="square_button_text_size">20sp</dimen>
+    <dimen name="num_pad_image_button_padding">8dp</dimen>
+</resources>
