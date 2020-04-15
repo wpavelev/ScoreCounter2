@@ -56,7 +56,12 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
     }
 
-    public void setPlayerLimit(int playerLimit) {
+    public void setDataset(List<Player> dataset) {
+        this.dataset = dataset;
+        notifyDataSetChanged();
+    }
+
+    /*   public void setPlayerLimit(int playerLimit) {
         this.playerLimit = playerLimit;
         if (this.dataset.size() != 0) {
             setDataset(this.datasetOrigin);
@@ -71,10 +76,11 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         } else {
             this.dataset = datasetOrigin.subList(0, playerLimit);
         }
-    }
+    }*/
 
     public void setActivePlayer(int activePlayer) {
         this.activePlayer = activePlayer;
+        notifyDataSetChanged();
     }
 
     public void setClickListener(ClickListener clickListener) {

@@ -10,6 +10,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import java.util.List;
 
+import androidx.lifecycle.Transformations;
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
 import de.wpavelev.scorecounter2.model.stuff.Name;
@@ -57,7 +58,6 @@ public class MainViewModel extends AndroidViewModel {
      */
     private MutableLiveData<Boolean> istSwappingAllowed = new MutableLiveData<>();
 
-
     private SingleLiveEvent<Boolean> showEditNameDialog = new SingleLiveEvent<>();
     private SingleLiveEvent<Boolean> showMenuDialog = new SingleLiveEvent<>();
 
@@ -75,9 +75,14 @@ public class MainViewModel extends AndroidViewModel {
         currentScore.setValue(0);
         longClickPlayer.setValue(-1);
         activePlayer.setValue(0);
+
+        Log.w(TAG, "MainViewModel: playerLimit wird zu Beginn auf 4 gesetzt");
         playerLimit.setValue(4);
         istSwappingAllowed.setValue(false);
+
+
     }
+
 
 
     public MutableLiveData<Integer> getCurrentScore() {
@@ -92,15 +97,16 @@ public class MainViewModel extends AndroidViewModel {
     public MutableLiveData<Integer> getLongClickPlayer() {
         return longClickPlayer;
     }
-
     public SingleLiveEvent<Boolean> getShowEditNameDialog() {
         return showEditNameDialog;
     }
-
     public SingleLiveEvent<Boolean> getShowMenuDialog() {
         return showMenuDialog;
     }
+    public LiveData<List<Player>> getPlayerLimited() {
+        return Transformations.switchMap(playerLimit, limit -> Transformations.map(getPlayers(), list -> list.subList(0, limit)));
 
+    }
     public void setCurrentScore(int score) {
         this.currentScore.setValue(score);
     }
@@ -134,8 +140,6 @@ public class MainViewModel extends AndroidViewModel {
 
         }
     }
-
-
     public void setShowMenuDialog(Boolean showMenuDialog) {
         this.showMenuDialog.setValue(showMenuDialog);
 
@@ -192,6 +196,8 @@ public class MainViewModel extends AndroidViewModel {
         istSwappingAllowed.setValue(true);
         //TODO swapbutton einschalten
     }
+
+
 
     //<editor-fold desc="Names (Repo)">
     public LiveData<List<Name>> getNames() {
