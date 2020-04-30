@@ -13,6 +13,8 @@ public class Player {
 
     private int score;
 
+    private int lastScore;
+
 
     public Player(String name) {
         this.name = name;
@@ -23,23 +25,31 @@ public class Player {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public int getScore() {
         return score;
     }
 
+    public int getLastScore() {
+        return lastScore;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public void setLastScore(int lastScore) {
+        this.lastScore = lastScore;
     }
 }

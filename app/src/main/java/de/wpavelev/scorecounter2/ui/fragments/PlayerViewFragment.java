@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.scorecounter2.databinding.FragmentPlayerViewBinding;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.wpavelev.scorecounter2.adapters.PlayerViewAdapter;
 import de.wpavelev.scorecounter2.dialogs.InsertNameDialog;
@@ -80,20 +79,18 @@ public class PlayerViewFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
+        //aktualisiert die Liste der Spieler im Adapter
         viewModel.getPlayerLimited().observe(getViewLifecycleOwner(), list -> adapter.setDataset(list));
 
-     /*   viewModel.getPlayers().observe(getViewLifecycleOwner(), players -> {
-            adapter.setDataset(players);
-            adapter.notifyDataSetChanged();
+        //sagt dem Adapter, wie viele Spieler eingestellt sind
+        //wichtig für die größe der Felder
+        viewModel.getPlayerLimit().observe(getViewLifecycleOwner(), integer -> adapter.setPlayerLimit(integer));
+
+        //sagt dem Adapter, welcher Spieler an der Reihe ist
+        viewModel.getActivePlayer().observe(getViewLifecycleOwner(), integer -> {
+            adapter.setActivePlayer(integer);
+            recyclerView.smoothScrollToPosition(integer);
         });
-
-
-        viewModel.getPlayerLimit().observe(getViewLifecycleOwner(), integer -> {
-            adapter.setPlayerLimit(integer);
-            adapter.notifyDataSetChanged();
-        });*/
-
-        viewModel.getActivePlayer().observe(getViewLifecycleOwner(), integer -> adapter.setActivePlayer(integer));
 
 
     }

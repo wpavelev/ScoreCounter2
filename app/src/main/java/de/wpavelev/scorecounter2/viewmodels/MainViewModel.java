@@ -7,14 +7,16 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
 
 import java.util.List;
 
-import androidx.lifecycle.Transformations;
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
+import de.wpavelev.scorecounter2.model.repos.ScoreRepository;
 import de.wpavelev.scorecounter2.model.stuff.Name;
 import de.wpavelev.scorecounter2.model.stuff.Player;
+import de.wpavelev.scorecounter2.model.stuff.Score;
 import de.wpavelev.scorecounter2.util.SingleLiveEvent;
 
 public class MainViewModel extends AndroidViewModel {
@@ -24,9 +26,11 @@ public class MainViewModel extends AndroidViewModel {
 
     private NameRepository nameRepository;
     private PlayerRepository playerRepository;
+    private ScoreRepository scoreRepository;
 
     private LiveData<List<Name>> names;
     private LiveData<List<Player>> players;
+    private LiveData<List<Score>> scores;
 
 
     /**
@@ -68,9 +72,11 @@ public class MainViewModel extends AndroidViewModel {
 
         playerRepository = new PlayerRepository(application);
         nameRepository = new NameRepository(application);
+        scoreRepository = new ScoreRepository(application);
 
         names = nameRepository.getAllNames();
         players = playerRepository.getAllPlayers();
+        scores = scoreRepository.getAllScores();
 
         currentScore.setValue(0);
         longClickPlayer.setValue(-1);
@@ -152,12 +158,12 @@ public class MainViewModel extends AndroidViewModel {
         int score = getCurrentScore().getValue();
         int activePlayer = getActivePlayer().getValue();
 
+        insertScore(new Score(activePlayer, score));
 
+        //update Player Values
         Player player = getPlayers().getValue().get(activePlayer);
-
-
         player.setScore(player.getScore() + score);
-
+        player.setLastScore(score);
         updatePlayer(player);
 
 
@@ -197,11 +203,18 @@ public class MainViewModel extends AndroidViewModel {
         //TODO swapbutton einschalten
     }
 
-
+    public void resetScores() {
+        List<Player> players_temp = players.getValue();
+        for (Player player : players_temp) {
+            player.setScore(0);
+            updatePlayer(player);
+        }
+        setSwapOn();
+        deleteAllScores();
+    }
 
     //<editor-fold desc="Names (Repo)">
     public LiveData<List<Name>> getNames() {
-
         return names;
     }
     public void insertName(Name name) {
@@ -236,6 +249,26 @@ public class MainViewModel extends AndroidViewModel {
     }
     public LiveData<List<Player>> getPlayers() {
         return players;
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Scores (Repo)">
+
+    public LiveData<List<Score>> getScores() {
+        return scores;
+    }
+    public void insertScore(Score score) {
+        scoreRepository.insert(score);
+    }
+    public void updateScore(Score score) {
+        scoreRepository.update(score);
+    }
+    public void deleteScore(Score score) {
+        scoreRepository.delete(score);
+    }
+    public void deleteAllScores() {
+        scoreRepository.deleteAll();
+
     }
     //</editor-fold>
 

@@ -11,6 +11,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 
 import de.wpavelev.scorecounter2.model.repos.NameDao;
 import de.wpavelev.scorecounter2.model.repos.PlayerDao;
+import de.wpavelev.scorecounter2.model.repos.ScoreDao;
 import de.wpavelev.scorecounter2.model.stuff.Name;
 import de.wpavelev.scorecounter2.model.stuff.Player;
 
@@ -20,11 +21,11 @@ public abstract class MyDatabase extends RoomDatabase {
 
     private static MyDatabase instance;
 
-
-
     public abstract PlayerDao playerDao();
 
     public abstract NameDao nameDao();
+
+    public abstract ScoreDao scoreDao();
 
     public static synchronized MyDatabase getInstance(Context context) {
 

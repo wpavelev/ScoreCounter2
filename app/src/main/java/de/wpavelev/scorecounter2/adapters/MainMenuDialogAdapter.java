@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.scorecounter2.R;
 
 import java.util.ArrayList;
@@ -24,8 +25,10 @@ public class MainMenuDialogAdapter extends RecyclerView.Adapter<MainMenuDialogAd
     LayoutInflater layoutInflater;
     ClickListener clickListener;
 
+    Context context;
     public MainMenuDialogAdapter(Context context, List<IconTextWrapper> dataSet, ClickListener clickListener) {
 
+        this.context = context;
         this.layoutInflater = LayoutInflater.from(context);
         this.dataSet = dataSet == null ? new ArrayList<>() : dataSet;
         this.clickListener = clickListener;
@@ -40,7 +43,12 @@ public class MainMenuDialogAdapter extends RecyclerView.Adapter<MainMenuDialogAd
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        holder.image.setImageResource(dataSet.get(position).getDrawable());
+
+        Glide
+                .with(context)
+                .load(dataSet.get(position).getDrawable())
+                .into(holder.image);
+
         holder.text.setText(dataSet.get(position).getText());
 
     }

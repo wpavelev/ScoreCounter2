@@ -39,6 +39,12 @@ public class MainFragment extends Fragment  {
                              @Nullable Bundle savedInstanceState) {
 
 
+        //TODO: ConstraintSet Transitions:
+        //TODO https://developer.android.com/training/constraint-layout
+
+
+
+
         this.binding = FragmentMainBinding.inflate(inflater, container, false);
 
         View view = binding.getRoot();

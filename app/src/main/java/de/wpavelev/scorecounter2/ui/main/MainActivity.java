@@ -70,6 +70,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        viewModel.getScores().observe(this, scores -> {
+            if (scores == null || scores.size() == 0) {
+                viewModel.setSwapOn();
+            }
+        });
+
         DisplayUtil.setDisplayWidthPx(getScreenWidthInPXs(this));
 
 
@@ -204,12 +210,11 @@ public class MainActivity extends AppCompatActivity {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.start_new_game)
+
                 .setPositiveButton("OK", (dialog, id) -> {
-                    // TODO: 03.04.2020 Werte zurücksetzten
-                    Toast.makeText(this, "Neues Spiel wird gestartet!", Toast.LENGTH_SHORT).show();
+                    viewModel.resetScores();
 
                 })
-
 
                 .setNegativeButton("NOOOOO", (dialog, id) -> {
 

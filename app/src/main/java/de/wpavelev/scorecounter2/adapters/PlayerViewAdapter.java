@@ -61,22 +61,12 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         notifyDataSetChanged();
     }
 
-    /*   public void setPlayerLimit(int playerLimit) {
+     public void setPlayerLimit(int playerLimit) {
         this.playerLimit = playerLimit;
-        if (this.dataset.size() != 0) {
-            setDataset(this.datasetOrigin);
+        notifyDataSetChanged();
 
-        }
     }
 
-    public void setDataset(List<Player> dataset) {
-        this.datasetOrigin = dataset;
-        if (playerLimit == 0  && datasetOrigin.size() == 0) {
-            this.dataset = datasetOrigin.subList(0, 0);
-        } else {
-            this.dataset = datasetOrigin.subList(0, playerLimit);
-        }
-    }*/
 
     public void setActivePlayer(int activePlayer) {
         this.activePlayer = activePlayer;
@@ -125,10 +115,12 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         private ConstraintLayout layout;
-        private TypedArray colorArray;
+        private TypedArray activePlayerArrayColor;
+        private TypedArray inactivePlayerArrayColor;
+
         private ItemPlayerViewRecyclerBinding viewHolderBinding;
 
-        Drawable background;
+
         Drawable border;
 
 
@@ -137,13 +129,16 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
 
             layout = binding.itemPlayerViewRecyclerView;
-            layout.setMaxWidth((int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (0.5 + playerLimit) ));
+            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (-0.5 + playerLimit));
+            layout.setMaxWidth(layoutWidth);
+            layout.setMinWidth(layoutWidth);
 
-            colorArray = context.getResources().obtainTypedArray(R.array.player_color);
 
 
 
-            background = context.getResources().getDrawable(R.drawable.item_player_view_background_0);
+            activePlayerArrayColor = context.getResources().obtainTypedArray(R.array.player_color);
+            inactivePlayerArrayColor = context.getResources().obtainTypedArray(R.array.inactive_player_color);
+
             border = context.getResources().getDrawable(R.drawable.border);
 
 
@@ -175,13 +170,15 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
                 }
 
-                int colorId = colorArray.getResourceId(arrayPosition, 0);
+                int activePlayerColorId = activePlayerArrayColor.getResourceId(arrayPosition, 0);
+                int inactivePlayerColorId = inactivePlayerArrayColor.getResourceId(arrayPosition, 0);
 
-                int playerBackground = context.getResources().getColor(colorId);
-                int activePlayerBackground = context.getResources().getColor(R.color.colorAccent);
-                int backgroundColor = activePlayer == playerPosition ? activePlayerBackground : playerBackground;
+                int playerBackground = context.getResources().getColor(inactivePlayerColorId);
+                if (activePlayer == playerPosition) {
+                    playerBackground = context.getResources().getColor(activePlayerColorId);
+                }
 
-                layout.setBackgroundColor(backgroundColor);
+                layout.setBackgroundColor(playerBackground);
 
             }
 

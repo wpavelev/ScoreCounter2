@@ -19,16 +19,11 @@ public class PlayerRepository {
 
     private LiveData<List<Player>> allPlayers;
 
-    private LiveData[] player = new LiveData[4];
+
     public PlayerRepository(Application application) {
         MyDatabase database = MyDatabase.getInstance(application);
         playerDao = database.playerDao();
         allPlayers = playerDao.getAllPlayer();
-        player[0]= playerDao.getPlayer(1);
-        player[1] = playerDao.getPlayer(2);
-        player[2]= playerDao.getPlayer(3);
-        player[3] = playerDao.getPlayer(4);
-
 
     }
 
