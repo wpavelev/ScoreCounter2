@@ -9,15 +9,15 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.model.repos.NameDao;
 import de.wpavelev.scorecounter2.model.repos.PlayerDao;
-import de.wpavelev.scorecounter2.model.repos.ScoreDao;
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
-import de.wpavelev.scorecounter2.model.data.Score;
+import de.wpavelev.scorecounter2.model.repos.ScoreDao;
 
 
-@Database(entities = {Player.class, Name.class, Score.class}, version = 1)
+@Database(entities = {Player.class, Name.class, Score.class}, version = 3, exportSchema = false)
 public abstract class MyDatabase extends RoomDatabase {
 
     private static MyDatabase instance;
@@ -27,6 +27,7 @@ public abstract class MyDatabase extends RoomDatabase {
     public abstract NameDao nameDao();
 
     public abstract ScoreDao scoreDao();
+
 
     public static synchronized MyDatabase getInstance(Context context) {
 

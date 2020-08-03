@@ -51,9 +51,6 @@ public class PlayerViewFragment extends Fragment {
 
         View view = binding.getRoot();
 
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-
-
         recyclerView = binding.playerViewRecycler;
         layoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
 
@@ -80,7 +77,11 @@ public class PlayerViewFragment extends Fragment {
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         //aktualisiert die Liste der Spieler im Adapter
-        viewModel.getPlayerLimited().observe(getViewLifecycleOwner(), list -> adapter.setDataset(list));
+        viewModel.getPlayerLimited().observe(getViewLifecycleOwner(), list -> {
+            if (list != null) {
+                adapter.setDataset(list);
+            }
+        });
 
         //sagt dem Adapter, wie viele Spieler eingestellt sind
         //wichtig für die größe der Felder

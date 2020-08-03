@@ -9,14 +9,15 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
-import de.wpavelev.scorecounter2.model.repos.ScoreRepository;
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.model.data.Score;
+import de.wpavelev.scorecounter2.model.repos.ScoreRepository;
 import de.wpavelev.scorecounter2.util.SingleLiveEvent;
 
 public class MainViewModel extends AndroidViewModel {
@@ -42,7 +43,6 @@ public class MainViewModel extends AndroidViewModel {
     /**
      * Indikator für einen Lonkclick auf einen Spieler X.
      * Wert zu Beginn ist -1.
-     *
      */
     private MutableLiveData<Integer> longClickPlayer = new MutableLiveData<>();
 
@@ -64,7 +64,6 @@ public class MainViewModel extends AndroidViewModel {
 
     private SingleLiveEvent<Boolean> showEditNameDialog = new SingleLiveEvent<>();
     private SingleLiveEvent<Boolean> showMenuDialog = new SingleLiveEvent<>();
-
 
 
     public MainViewModel(@NonNull Application application) {
@@ -90,44 +89,64 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-
     public MutableLiveData<Integer> getCurrentScore() {
         return currentScore;
     }
+
     public MutableLiveData<Integer> getActivePlayer() {
         return activePlayer;
     }
+
     public MutableLiveData<Integer> getPlayerLimit() {
         return playerLimit;
     }
+
     public MutableLiveData<Integer> getLongClickPlayer() {
         return longClickPlayer;
     }
+
     public SingleLiveEvent<Boolean> getShowEditNameDialog() {
         return showEditNameDialog;
     }
+
     public SingleLiveEvent<Boolean> getShowMenuDialog() {
         return showMenuDialog;
     }
+
     public LiveData<List<Player>> getPlayerLimited() {
-        return Transformations.switchMap(playerLimit, limit -> Transformations.map(getPlayers(), list -> list.subList(0, limit)));
+        return Transformations.switchMap(playerLimit, limit -> Transformations.map(getPlayers(), list -> {
+
+            int min = Math.min(limit, list.size());
+            return list.subList(0, min);
+
+                }
+
+        ));
 
     }
+
+
+
     public void setCurrentScore(int score) {
         this.currentScore.setValue(score);
     }
+
     public void setLongClickPlayer(int selectedPlayer) {
         this.longClickPlayer.setValue(selectedPlayer);
     }
+
     public void setActivePlayer(int activePlayer) {
         this.activePlayer.setValue(activePlayer);
     }
+
     public void setPlayerLimit(int playerLimit) {
         this.playerLimit.setValue(playerLimit);
     }
+
     public void setShowEditNameDialog() {
         this.showEditNameDialog.setValue(true);
     }
+
     public void setPlayerName(int player, String name) {
         List<Player> allplayer = getPlayers().getValue();
 
@@ -146,12 +165,14 @@ public class MainViewModel extends AndroidViewModel {
 
         }
     }
+
     public void setShowMenuDialog(Boolean showMenuDialog) {
         this.showMenuDialog.setValue(showMenuDialog);
 
     }
 
     public void onClickSubmit() {
+
         setSwapOff();
 
         //Score Speichern
@@ -169,12 +190,9 @@ public class MainViewModel extends AndroidViewModel {
 
         //Spieler weiterschalten
         if (activePlayer < getPlayerLimit().getValue() - 1) {
-
             activePlayer++;
         } else {
             activePlayer = 0;
-
-
         }
 
 //        setPlayerButtons(activePlayer);
@@ -217,18 +235,22 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<List<Name>> getNames() {
         return names;
     }
+
     public void insertName(Name name) {
         nameRepository.insert(name);
 
     }
+
     public void updateName(Name name) {
         nameRepository.update(name);
 
     }
+
     public void deleteName(Name name) {
         nameRepository.delete(name);
 
     }
+
     public void deleteAllNames() {
         nameRepository.deleteAll();
     }
@@ -238,15 +260,19 @@ public class MainViewModel extends AndroidViewModel {
     public void insertPlayer(Player player) {
         playerRepository.insert(player);
     }
+
     public void updatePlayer(Player player) {
         playerRepository.update(player);
     }
+
     public void deletePlayer(Player player) {
         playerRepository.delete(player);
     }
+
     public void deleteAllPlayer() {
         playerRepository.deleteAll();
     }
+
     public LiveData<List<Player>> getPlayers() {
         return players;
     }
@@ -257,19 +283,25 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<List<Score>> getScores() {
         return scores;
     }
+
     public void insertScore(Score score) {
         scoreRepository.insert(score);
     }
+
     public void updateScore(Score score) {
         scoreRepository.update(score);
     }
+
     public void deleteScore(Score score) {
         scoreRepository.delete(score);
     }
+
     public void deleteAllScores() {
         scoreRepository.deleteAll();
 
     }
+
+
     //</editor-fold>
 
 

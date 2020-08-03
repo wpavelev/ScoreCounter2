@@ -40,10 +40,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
     private LongClickListener longClickListener;
 
 
-
-
     private Context context;
-
 
 
     public PlayerViewAdapter(Context context, List<Player> dataset) {
@@ -132,8 +129,6 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
             layout.setMinWidth(layoutWidth);
 
 
-
-
             activePlayerArrayColor = context.getResources().obtainTypedArray(R.array.player_color);
             inactivePlayerArrayColor = context.getResources().obtainTypedArray(R.array.inactive_player_color);
 
@@ -152,7 +147,6 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         }
 
         public void bind(Player player) {
-            Log.d(TAG, "Player_bind:" + player.getName());
             this.viewHolderBinding.setPlayer(player);
         }
 

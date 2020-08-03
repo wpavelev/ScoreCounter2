@@ -29,6 +29,5 @@ public interface ScoreDao {
     @Query("SELECT * FROM Score ORDER BY id")
     LiveData<List<Score>> getAllScores();
 
-    @Query("SELECT * FROM Score WHERE player = :playerId ORDER BY id DESC LIMIT 1")
-    LiveData<Score> getLastScore(String playerId);
+
 }
