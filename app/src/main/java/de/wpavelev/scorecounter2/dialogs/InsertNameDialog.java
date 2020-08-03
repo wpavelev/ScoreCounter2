@@ -17,8 +17,8 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.scorecounter2.R;
 
-import de.wpavelev.scorecounter2.model.stuff.Name;
-import de.wpavelev.scorecounter2.model.stuff.Player;
+import de.wpavelev.scorecounter2.model.data.Name;
+import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class InsertNameDialog extends DialogFragment {

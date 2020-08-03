@@ -12,9 +12,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import de.wpavelev.scorecounter2.model.repos.NameDao;
 import de.wpavelev.scorecounter2.model.repos.PlayerDao;
 import de.wpavelev.scorecounter2.model.repos.ScoreDao;
-import de.wpavelev.scorecounter2.model.stuff.Name;
-import de.wpavelev.scorecounter2.model.stuff.Player;
-import de.wpavelev.scorecounter2.model.stuff.Score;
+import de.wpavelev.scorecounter2.model.data.Name;
+import de.wpavelev.scorecounter2.model.data.Player;
+import de.wpavelev.scorecounter2.model.data.Score;
 
 
 @Database(entities = {Player.class, Name.class, Score.class}, version = 1)

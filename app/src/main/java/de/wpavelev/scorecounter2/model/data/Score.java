@@ -1,4 +1,4 @@
-package de.wpavelev.scorecounter2.model.stuff;
+package de.wpavelev.scorecounter2.model.data;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

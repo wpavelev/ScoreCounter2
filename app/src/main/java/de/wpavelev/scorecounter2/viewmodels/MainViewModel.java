@@ -14,9 +14,9 @@ import java.util.List;
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
 import de.wpavelev.scorecounter2.model.repos.ScoreRepository;
-import de.wpavelev.scorecounter2.model.stuff.Name;
-import de.wpavelev.scorecounter2.model.stuff.Player;
-import de.wpavelev.scorecounter2.model.stuff.Score;
+import de.wpavelev.scorecounter2.model.data.Name;
+import de.wpavelev.scorecounter2.model.data.Player;
+import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.util.SingleLiveEvent;
 
 public class MainViewModel extends AndroidViewModel {

@@ -14,7 +14,7 @@ import com.example.scorecounter2.R;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.wpavelev.scorecounter2.model.stuff.Name;
+import de.wpavelev.scorecounter2.model.data.Name;
 
 public class NameListDialogAdapter extends RecyclerView.Adapter<NameListDialogAdapter.MyViewHolder> {
 

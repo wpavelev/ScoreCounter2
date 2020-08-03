@@ -9,7 +9,7 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import de.wpavelev.scorecounter2.model.stuff.Player;
+import de.wpavelev.scorecounter2.model.data.Player;
 
 @Dao
 public interface PlayerDao {

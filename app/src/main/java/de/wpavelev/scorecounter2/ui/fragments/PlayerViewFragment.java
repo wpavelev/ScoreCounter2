@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import de.wpavelev.scorecounter2.adapters.PlayerViewAdapter;
 import de.wpavelev.scorecounter2.dialogs.InsertNameDialog;
 import de.wpavelev.scorecounter2.dialogs.NameListDialog;
-import de.wpavelev.scorecounter2.model.stuff.Name;
-import de.wpavelev.scorecounter2.model.stuff.Player;
+import de.wpavelev.scorecounter2.model.data.Name;
+import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class PlayerViewFragment extends Fragment {

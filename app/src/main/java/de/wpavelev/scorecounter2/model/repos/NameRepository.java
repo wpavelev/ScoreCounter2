@@ -8,7 +8,7 @@ import androidx.lifecycle.LiveData;
 import java.util.List;
 
 import de.wpavelev.scorecounter2.model.database.MyDatabase;
-import de.wpavelev.scorecounter2.model.stuff.Name;
+import de.wpavelev.scorecounter2.model.data.Name;
 
 
 public class NameRepository {

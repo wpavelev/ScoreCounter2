@@ -17,7 +17,7 @@ import com.example.scorecounter2.databinding.ItemPlayerViewRecyclerBinding;
 
 import java.util.List;
 
-import de.wpavelev.scorecounter2.model.stuff.Player;
+import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.util.DisplayUtil;
 
 public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.MyViewHolder> {
@@ -50,8 +50,6 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         this.context = context;
         setDataset(dataset);
         Log.d(TAG, "PlayerViewAdapter: dataset_size " + dataset.size());
-
-
 
 
     }

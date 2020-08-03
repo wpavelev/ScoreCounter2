@@ -19,7 +19,7 @@ import com.example.scorecounter2.R;
 import java.util.ArrayList;
 
 import de.wpavelev.scorecounter2.adapters.NameListDialogAdapter;
-import de.wpavelev.scorecounter2.model.stuff.Name;
+import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class NameListDialog extends DialogFragment {
