@@ -14,9 +14,10 @@ import de.wpavelev.scorecounter2.model.repos.PlayerDao;
 import de.wpavelev.scorecounter2.model.repos.ScoreDao;
 import de.wpavelev.scorecounter2.model.stuff.Name;
 import de.wpavelev.scorecounter2.model.stuff.Player;
+import de.wpavelev.scorecounter2.model.stuff.Score;
 
 
-@Database(entities = {Player.class, Name.class, }, version = 1)
+@Database(entities = {Player.class, Name.class, Score.class}, version = 1)
 public abstract class MyDatabase extends RoomDatabase {
 
     private static MyDatabase instance;
@@ -52,10 +53,12 @@ public abstract class MyDatabase extends RoomDatabase {
     private static class PopulateDbAsyncTask extends AsyncTask<Void, Void, Void> {
         private PlayerDao playerDao;
         private NameDao nameDao;
+        private ScoreDao scoreDao;
 
         private PopulateDbAsyncTask(MyDatabase db) {
             playerDao = db.playerDao();
             nameDao = db.nameDao();
+            scoreDao = db.scoreDao();
         }
 
         @Override
