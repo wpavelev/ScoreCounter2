@@ -5,10 +5,11 @@
     >
 
     <data>
-        <variable
-            name="player"
-            type="de.wpavelev.scorecounter2.model.data.Player" />
-    </data>
+    <variable
+        name="player"
+        type="de.wpavelev.scorecounter2.model.data.Player" />
+
+</data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/item_player_view_recycler_view"
@@ -23,9 +24,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:gravity="center"
-            android:textAlignment="center"
             android:singleLine="true"
             android:text="@{player.name}"
+            android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -38,21 +39,35 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="@{String.valueOf(player.score)}"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
-            android:textSize="16sp"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
             app:layout_constraintEnd_toEndOf="@+id/item_player_view_recycler_player_name"
             app:layout_constraintStart_toStartOf="@+id/item_player_view_recycler_player_name"
             app:layout_constraintTop_toBottomOf="@id/item_player_view_recycler_player_name" />
 
-        <TextView
-            android:id="@+id/textView"
+
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/itemPlayerViewRecyclerPlayerScore"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="194dp"
             android:layout_marginTop="8dp"
-            android:text='@{"+ " + String.valueOf(player.lastScore)}'
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle2"
             app:layout_constraintEnd_toEndOf="@+id/item_player_view_recycler_player_name"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="@+id/item_player_view_recycler_player_name"
+            app:layout_constraintTop_toBottomOf="@+id/divider2" />
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="0dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="@android:drawable/divider_horizontal_bright"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/item_player_view_recycler_score" />
 
 

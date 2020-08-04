@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.scorecounter2.R;
 import com.example.scorecounter2.databinding.ActivityMainBinding;
+import com.facebook.stetho.Stetho;
 
 import de.wpavelev.scorecounter2.dialogs.MainMenuDialog;
 import de.wpavelev.scorecounter2.dialogs.PlayerNumberDialog;
@@ -46,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         int mainContainer = binding.mainActivityContainer.getId();
+
+        Stetho.initializeWithDefaults(this);
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
@@ -88,15 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 viewModel.setSwapOn();
             }
 
-            int size = scores.size();
-
-            Log.d(TAG, "scores:");
-            for (int i = 0; i < size; i++) {
-                Log.d(TAG, "id:" + scores.get(i).getId() + " " +
-                        "playerId:" + scores.get(i).getPlayer() + " " +
-                        "score:" + scores.get(i).getScore());
-
-            }
 
         });
 
@@ -140,8 +134,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
     private void onMainMenuOptionSeleceted(int position) {
         switch (position) {
             case 0:
@@ -153,8 +145,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case 2:
-
-
                 break;
 
             default:

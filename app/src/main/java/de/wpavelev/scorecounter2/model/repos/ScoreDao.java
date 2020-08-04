@@ -26,8 +26,10 @@ public interface ScoreDao {
     @Query("DELETE FROM Score")
     void deleteAll();
 
-    @Query("SELECT * FROM Score ORDER BY id")
+    @Query("SELECT * FROM Score ORDER BY id DESC")
     LiveData<List<Score>> getAllScores();
+
+
 
 
 }

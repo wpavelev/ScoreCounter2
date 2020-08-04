@@ -2,6 +2,7 @@ package de.wpavelev.scorecounter2.model.repos;
 
 import android.app.Application;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
@@ -15,13 +16,11 @@ import de.wpavelev.scorecounter2.model.database.MyDatabase;
 
 public class ScoreRepository {
 
+    private static final String TAG = "ScoreRepository";
 
     private ScoreDao scoreDao;
 
     private LiveData<List<Score>> allScores;
-
-    private List<LiveData<List<Score>>> scoresByPlayer;
-
 
 
     public ScoreRepository(Application application) {
@@ -50,7 +49,6 @@ public class ScoreRepository {
     public LiveData<List<Score>> getAllScores() {
         return allScores;
     }
-
 
 
     private static class InsertScoreAsynchTask extends AsyncTask<Score, Void, Void> {

@@ -2,6 +2,7 @@ package de.wpavelev.scorecounter2.viewmodels;
 
 import android.app.Application;
 import android.util.Log;
+import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -10,7 +11,9 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
@@ -77,12 +80,13 @@ public class MainViewModel extends AndroidViewModel {
         players = playerRepository.getAllPlayers();
         scores = scoreRepository.getAllScores();
 
+
         currentScore.setValue(0);
         longClickPlayer.setValue(-1);
         activePlayer.setValue(0);
 
         Log.w(TAG, "MainViewModel: playerLimit wird zu Beginn auf 4 gesetzt");
-        playerLimit.setValue(4);
+        setPlayerLimit(4);
         istSwappingAllowed.setValue(false);
 
 
@@ -116,14 +120,19 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<List<Player>> getPlayerLimited() {
         return Transformations.switchMap(playerLimit, limit -> Transformations.map(getPlayers(), list -> {
 
-            int min = Math.min(limit, list.size());
-            return list.subList(0, min);
+                    int min = Math.min(limit, list.size());
+                    return list.subList(0, min);
 
                 }
 
         ));
 
     }
+
+
+
+
+
 
 
 
@@ -171,6 +180,10 @@ public class MainViewModel extends AndroidViewModel {
 
     }
 
+    private int getActivePlayerId() {
+        return getPlayers().getValue().get(activePlayer.getValue()).getId();
+    }
+
     public void onClickSubmit() {
 
         setSwapOff();
@@ -179,7 +192,7 @@ public class MainViewModel extends AndroidViewModel {
         int score = getCurrentScore().getValue();
         int activePlayer = getActivePlayer().getValue();
 
-        insertScore(new Score(activePlayer, score));
+        insertScore(new Score(getActivePlayerId(), score));
 
         //update Player Values
         Player player = getPlayers().getValue().get(activePlayer);

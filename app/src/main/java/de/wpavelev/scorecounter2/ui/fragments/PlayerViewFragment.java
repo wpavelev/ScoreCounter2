@@ -2,6 +2,7 @@ package de.wpavelev.scorecounter2.ui.fragments;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +17,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.scorecounter2.databinding.FragmentPlayerViewBinding;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import de.wpavelev.scorecounter2.adapters.PlayerViewAdapter;
 import de.wpavelev.scorecounter2.dialogs.InsertNameDialog;
 import de.wpavelev.scorecounter2.dialogs.NameListDialog;
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
+import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class PlayerViewFragment extends Fragment {
@@ -76,12 +81,36 @@ public class PlayerViewFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
+
         //aktualisiert die Liste der Spieler im Adapter
         viewModel.getPlayerLimited().observe(getViewLifecycleOwner(), list -> {
-            if (list != null) {
-                adapter.setDataset(list);
+
+            if (list == null) {
+                adapter.setPlayerList(new ArrayList<>());
             }
+
+
+            adapter.setPlayerList(list);
+
         });
+
+        viewModel.getScores().observe(getViewLifecycleOwner(), scoreList -> {
+            SparseArray<List<Score>> sparseArray = new SparseArray<>();
+            Set<Integer> playerIdExists = new HashSet<>();
+            for (Score score : scoreList) {
+                int playerId = score.getPlayer();
+
+                if (!playerIdExists.contains(playerId)) {
+                    sparseArray.put(playerId, new ArrayList<>());
+                }
+                playerIdExists.add(playerId);
+                sparseArray.get(playerId).add(score);
+
+            }
+
+            adapter.setPlayerScores(sparseArray);
+        });
+
 
         //sagt dem Adapter, wie viele Spieler eingestellt sind
         //wichtig für die größe der Felder

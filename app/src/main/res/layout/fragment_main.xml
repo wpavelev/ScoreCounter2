@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent=".38" />
+            app:layout_constraintGuide_percent="0.55" />
 
 
         <androidx.constraintlayout.widget.Guideline
@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.2" />
+            app:layout_constraintGuide_percent="0.4" />
 
         <FrameLayout
             android:id="@+id/main_fragment_frame_num_pad"

@@ -1,9 +1,11 @@
 package de.wpavelev.scorecounter2.model.data;
 
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Player {
@@ -54,5 +56,6 @@ public class Player {
     public void setLastScore(int lastScore) {
         this.lastScore = lastScore;
     }
+
 
 }

@@ -4,35 +4,42 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scorecounter2.R;
 import com.example.scorecounter2.databinding.ItemPlayerViewRecyclerBinding;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.wpavelev.scorecounter2.model.data.Player;
+import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.util.DisplayUtil;
+import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.MyViewHolder> {
 
     public interface ClickListener {
         void onItemClick(View v, int position);
     }
+
     public interface LongClickListener {
         void onItemLongClick(View v, int position);
     }
 
-    private String TAG = "SimpleNameListAdapter";
+    private String TAG = "PlayerViewAdapter";
 
-    private List<Player> dataset;
-    private List<Player> datasetOrigin;
+    private List<Player> playerList;
+    private SparseArray<List<Score>> playerScores;
+
 
     private int playerLimit = 0;
     private int activePlayer = 0;
@@ -41,22 +48,32 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
 
     private Context context;
+    private MainViewModel viewModel;
 
+    public PlayerViewAdapter(Context context, List<Player> playerList) {
 
-    public PlayerViewAdapter(Context context, List<Player> dataset) {
         this.context = context;
-        setDataset(dataset);
-        Log.d(TAG, "PlayerViewAdapter: dataset_size " + dataset.size());
+        this.viewModel = viewModel;
+
+        this.playerList = playerList;
+        Log.d(TAG, "PlayerViewAdapter: dataset_size " + playerList.size());
 
 
     }
 
-    public void setDataset(List<Player> dataset) {
-        this.dataset = dataset;
+    public void setPlayerList(List<Player> playerList) {
+        this.playerList = playerList;
+
         notifyDataSetChanged();
     }
 
-     public void setPlayerLimit(int playerLimit) {
+    public void setPlayerScores(SparseArray<List<Score>> playerScores) {
+        this.playerScores = playerScores;
+        notifyDataSetChanged();
+    }
+
+    public void setPlayerLimit(int playerLimit) {
+
         this.playerLimit = playerLimit;
         notifyDataSetChanged();
 
@@ -76,7 +93,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         this.longClickListener = longClickListener;
     }
 
-            
+
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -94,9 +111,14 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Player player = dataset.get(position);
+        Player player = playerList.get(position);
         holder.setPlayerPosition(position, activePlayer);
-        holder.bind(player);
+        holder.bindPlayer(player);
+
+
+        if (playerScores != null) {
+            holder.bindPlayerScore(playerScores.get(player.getId()));
+        }
 
 
     }
@@ -104,8 +126,9 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
     @Override
     public int getItemCount() {
-        return dataset.size();
+        return playerList.size();
     }
+
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
@@ -113,8 +136,13 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         private TypedArray activePlayerArrayColor;
         private TypedArray inactivePlayerArrayColor;
 
+        private RecyclerView recyclerPlayerScore;
+
         private ItemPlayerViewRecyclerBinding viewHolderBinding;
 
+        PlayerScoreAdapter playerScoreAdapter;
+
+        List<Score> playerScores;
 
         Drawable border;
 
@@ -122,6 +150,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         public MyViewHolder(ItemPlayerViewRecyclerBinding binding) {
             super(binding.getRoot());
 
+            this.viewHolderBinding = binding;
 
             layout = binding.itemPlayerViewRecyclerView;
             int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (-0.5 + playerLimit));
@@ -135,7 +164,12 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
             border = context.getResources().getDrawable(R.drawable.border);
 
 
-            this.viewHolderBinding = binding;
+            playerScores = new ArrayList<>();
+            recyclerPlayerScore = binding.itemPlayerViewRecyclerPlayerScore;
+            recyclerPlayerScore.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
+            playerScoreAdapter = new PlayerScoreAdapter(context, playerScores);
+            recyclerPlayerScore.setAdapter(playerScoreAdapter);
+
 
             if (clickListener != null) {
                 itemView.setOnClickListener(this);
@@ -146,8 +180,25 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
         }
 
-        public void bind(Player player) {
+        public void bindPlayer(Player player) {
             this.viewHolderBinding.setPlayer(player);
+
+        }
+
+        public void bindPlayerScore(List<Score> playerScores) {
+            if (playerScores != null) {
+                this.playerScores = playerScores;
+                playerScoreAdapter.setDataset(playerScores);
+                playerScoreAdapter.notifyDataSetChanged();
+                Log.d(TAG, "playerscores: ");
+                for (Score playerScore : playerScores) {
+                    Log.d(TAG, "score.player=" + playerScore.getPlayer() + " " +
+                            "score.score=" + playerScore.getScore());
+                }
+
+            } else {
+                Log.w(TAG, "bindPlayerScore: playerScores is null!");
+            }
         }
 
         public void setPlayerPosition(int playerPosition, int activePlayer) {
@@ -178,7 +229,6 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         }
 
 
-
         @Override
         public void onClick(View v) {
             if (clickListener == null) {
@@ -201,8 +251,6 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
             return false;
         }
     }
-
-   
 
 
 }
