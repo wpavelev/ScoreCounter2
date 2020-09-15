@@ -25,7 +25,6 @@ import de.wpavelev.scorecounter2.dialogs.MainMenuDialog;
 import de.wpavelev.scorecounter2.dialogs.PlayerNumberDialog;
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
-import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.ui.fragments.MainFragment;
 import de.wpavelev.scorecounter2.util.DisplayUtil;
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
@@ -34,13 +33,12 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "SC2: MainActivity";
 
-    private ActivityMainBinding binding;
     private MainViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.binding = ActivityMainBinding.inflate(getLayoutInflater());
+        com.example.scorecounter2.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         Toolbar toolbar = binding.toolbar;
@@ -48,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         int mainContainer = binding.mainActivityContainer.getId();
 
+        // TODO: 10.08.2020 Stetho debug raus
         Stetho.initializeWithDefaults(this);
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
@@ -79,18 +78,15 @@ public class MainActivity extends AppCompatActivity {
 
         viewModel.getShowMenuDialog().observe(this, aBoolean -> {
             if (aBoolean) {
-                MainMenuDialog mainMenuDialog = new MainMenuDialog(position -> {
-                    onMainMenuOptionSeleceted(position);
-                });
+                MainMenuDialog mainMenuDialog = new MainMenuDialog(position -> onMainMenuOptionSeleceted(position));
                 mainMenuDialog.show(getSupportFragmentManager(), "mainMenuDialog");
             }
         });
 
         viewModel.getScores().observe(this, scores -> {
             if (scores == null || scores.size() == 0) {
-                viewModel.setSwapOn();
+                viewModel.setSwap(true);
             }
-
 
         });
 
@@ -180,10 +176,7 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(R.string.start_new_game)
 
-                .setPositiveButton("OK", (dialog, id) -> {
-                    viewModel.resetScores();
-
-                })
+                .setPositiveButton("OK", (dialog, id) -> viewModel.newGame())
 
                 .setNegativeButton("NOOOOO", (dialog, id) -> {
 

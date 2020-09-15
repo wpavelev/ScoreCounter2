@@ -17,7 +17,7 @@ import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.model.repos.ScoreDao;
 
 
-@Database(entities = {Player.class, Name.class, Score.class}, version = 3, exportSchema = false)
+@Database(entities = {Player.class, Name.class, Score.class}, version = 4, exportSchema = false)
 public abstract class MyDatabase extends RoomDatabase {
 
     private static MyDatabase instance;

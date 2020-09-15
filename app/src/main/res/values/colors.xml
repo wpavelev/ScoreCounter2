@@ -18,7 +18,8 @@
 
     <color name="main_background">@android:color/white</color>
 
-    <color name="num_pad_button_background">@color/main_background</color>
+    <color name="scoreItemBackground">@android:color/transparent</color>
 
+    <color name="num_pad_button_background">@color/main_background</color>
 
 </resources>

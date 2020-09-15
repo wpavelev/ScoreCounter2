@@ -10,6 +10,8 @@ public class Score {
 
     int player;
 
+    boolean isSelected;
+
     public Score(int player, int score) {
         this.score = score;
         this.player = player;
@@ -40,5 +42,13 @@ public class Score {
 
     public void setPlayer(int player) {
         this.player = player;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 }

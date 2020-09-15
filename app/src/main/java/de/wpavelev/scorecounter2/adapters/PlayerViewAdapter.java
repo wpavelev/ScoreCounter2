@@ -8,6 +8,8 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -23,7 +25,6 @@ import java.util.List;
 import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.util.DisplayUtil;
-import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.MyViewHolder> {
 
@@ -35,31 +36,54 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         void onItemLongClick(View v, int position);
     }
 
+    public interface ScoreChangeListener {
+        void onScoreChange(Score score);
+    }
+
+
     private String TAG = "PlayerViewAdapter";
 
+    /**
+     * Liste der Spieler, die angezeigt werden
+     */
     private List<Player> playerList;
+
+    /**
+     * Listen von Scores, die in Tabellenform angezeigt werden
+     */
     private SparseArray<List<Score>> playerScores;
 
 
-    private int playerLimit = 0;
+    /**
+     * Anzahl der Spieler
+     */
+    private int playerCount = 0;
+
+    /**
+     * Spieler, der an der Reihe ist
+     */
     private int activePlayer = 0;
+
+
+    private int editingScore = 0;
+
+    private ScoreChangeListener scoreChangeListener;
     private ClickListener clickListener;
     private LongClickListener longClickListener;
 
 
     private Context context;
-    private MainViewModel viewModel;
 
     public PlayerViewAdapter(Context context, List<Player> playerList) {
 
         this.context = context;
-        this.viewModel = viewModel;
 
         this.playerList = playerList;
         Log.d(TAG, "PlayerViewAdapter: dataset_size " + playerList.size());
 
 
     }
+
 
     public void setPlayerList(List<Player> playerList) {
         this.playerList = playerList;
@@ -72,13 +96,12 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         notifyDataSetChanged();
     }
 
-    public void setPlayerLimit(int playerLimit) {
+    public void setPlayerCount(int playerCount) {
 
-        this.playerLimit = playerLimit;
+        this.playerCount = playerCount;
         notifyDataSetChanged();
 
     }
-
 
     public void setActivePlayer(int activePlayer) {
         this.activePlayer = activePlayer;
@@ -93,6 +116,14 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         this.longClickListener = longClickListener;
     }
 
+    public void setScoreChangeListener(ScoreChangeListener scoreChangeListener) {
+        this.scoreChangeListener = scoreChangeListener;
+    }
+
+    public void setEditScore(int score) {
+        this.editingScore = score;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
@@ -120,6 +151,11 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
             holder.bindPlayerScore(playerScores.get(player.getId()));
         }
 
+        if (editingScore != -1) {
+            holder.setEditScore(editingScore);
+
+        }
+
 
     }
 
@@ -136,13 +172,10 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         private TypedArray activePlayerArrayColor;
         private TypedArray inactivePlayerArrayColor;
 
-        private RecyclerView recyclerPlayerScore;
-
         private ItemPlayerViewRecyclerBinding viewHolderBinding;
 
         PlayerScoreAdapter playerScoreAdapter;
 
-        List<Score> playerScores;
 
         Drawable border;
 
@@ -153,7 +186,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
             this.viewHolderBinding = binding;
 
             layout = binding.itemPlayerViewRecyclerView;
-            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (-0.5 + playerLimit));
+            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (-0.5 + playerCount));
             layout.setMaxWidth(layoutWidth);
             layout.setMinWidth(layoutWidth);
 
@@ -164,19 +197,34 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
             border = context.getResources().getDrawable(R.drawable.border);
 
 
-            playerScores = new ArrayList<>();
-            recyclerPlayerScore = binding.itemPlayerViewRecyclerPlayerScore;
+            RecyclerView recyclerPlayerScore = binding.itemPlayerViewRecyclerPlayerScore;
             recyclerPlayerScore.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
-            playerScoreAdapter = new PlayerScoreAdapter(context, playerScores);
+
+            playerScoreAdapter = new PlayerScoreAdapter(context);
+
+            playerScoreAdapter.setClickListener((v, score) -> Toast.makeText(context, ""+score.getScore(), Toast.LENGTH_SHORT).show());
+
+            playerScoreAdapter.setLongClickListener((v, score) -> scoreChangeListener.onScoreChange(score));
+
+
             recyclerPlayerScore.setAdapter(playerScoreAdapter);
 
 
             if (clickListener != null) {
                 itemView.setOnClickListener(this);
+            } else {
+                Log.d(TAG, "MyViewHolder: clickListener is null");
+
             }
+
             if (longClickListener != null) {
                 itemView.setOnLongClickListener(this);
+            }else {
+                Log.d(TAG, "MyViewHolder: longClickListener is null");
+
             }
+
+
 
         }
 
@@ -185,9 +233,13 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
         }
 
+        public void setEditScore(int score) {
+            playerScoreAdapter.setEditScore(score);
+
+        }
+
         public void bindPlayerScore(List<Score> playerScores) {
             if (playerScores != null) {
-                this.playerScores = playerScores;
                 playerScoreAdapter.setDataset(playerScores);
                 playerScoreAdapter.notifyDataSetChanged();
                 Log.d(TAG, "playerscores: ");
@@ -197,6 +249,8 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
                 }
 
             } else {
+                playerScoreAdapter.setDataset(new ArrayList<>());
+                playerScoreAdapter.notifyDataSetChanged();
                 Log.w(TAG, "bindPlayerScore: playerScores is null!");
             }
         }
@@ -206,7 +260,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
             int arrayPosition;
             if (playerPosition >= 0) {
-                if (playerLimit < 4) {
+                if (playerCount < 4) {
                     arrayPosition = playerPosition;
                 } else {
                     arrayPosition = playerPosition % 4;

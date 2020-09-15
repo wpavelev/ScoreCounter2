@@ -2,18 +2,18 @@ package de.wpavelev.scorecounter2.viewmodels;
 
 import android.app.Application;
 import android.util.Log;
-import android.util.SparseArray;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import com.example.scorecounter2.R;
+
 import java.util.List;
-import java.util.Set;
 
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
@@ -25,7 +25,10 @@ import de.wpavelev.scorecounter2.util.SingleLiveEvent;
 
 public class MainViewModel extends AndroidViewModel {
 
-    private static final String TAG = "SC2: MainViewModel";
+    private static final String TAG = "MainViewModel";
+
+    public static final int INPUTMODE_DEFAULT = 0;
+    public static final int INPUTMODE_EDIT_SCORE = 1;
 
 
     private NameRepository nameRepository;
@@ -35,6 +38,8 @@ public class MainViewModel extends AndroidViewModel {
     private LiveData<List<Name>> names;
     private LiveData<List<Player>> players;
     private LiveData<List<Score>> scores;
+
+    TextView textViewScore;
 
 
     /**
@@ -63,11 +68,25 @@ public class MainViewModel extends AndroidViewModel {
      * Indikator für die Erlaubnis an Rotation der Spieler. (Darf nur vor
      * der ersten Runde geschehen)
      */
-    private MutableLiveData<Boolean> istSwappingAllowed = new MutableLiveData<>();
+    private MutableLiveData<Boolean> isSwappingAllowed = new MutableLiveData<>();
+
 
     private SingleLiveEvent<Boolean> showEditNameDialog = new SingleLiveEvent<>();
     private SingleLiveEvent<Boolean> showMenuDialog = new SingleLiveEvent<>();
 
+    /**
+     * Die Zuordnung des Scores zur Datenbank. Hier wird der neue Wert eingefügt, in die Datenbank
+     * geschickt und geupdatet.
+     */
+    private Score editScore = new Score(0,0);
+
+
+    /**
+     * Gibt an, wohin die eingebeben Zahlen geschickt werden
+     * 0 = Standard (Current Score)
+     * 1 = Score Bearbeiten
+     */
+    private int inputMode = INPUTMODE_DEFAULT;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -87,10 +106,15 @@ public class MainViewModel extends AndroidViewModel {
 
         Log.w(TAG, "MainViewModel: playerLimit wird zu Beginn auf 4 gesetzt");
         setPlayerLimit(4);
-        istSwappingAllowed.setValue(false);
+        isSwappingAllowed.setValue(false);
 
 
     }
+
+
+    //<editor-fold desc="Getter">
+
+
 
 
     public MutableLiveData<Integer> getCurrentScore() {
@@ -129,12 +153,39 @@ public class MainViewModel extends AndroidViewModel {
 
     }
 
+    public void setShowMenuDialog(Boolean showMenuDialog) {
+        this.showMenuDialog.setValue(showMenuDialog);
+
+    }
+
+    private int getActivePlayerId() {
+        return getPlayers().getValue().get(activePlayer.getValue()).getId();
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Setter">
 
 
+    public void setTextViewScore(TextView textViewScore) {
+        this.textViewScore = textViewScore;
+    }
 
+    public void setEditScore(Score editScore) {
+        if (this.editScore.isSelected()) {
+            this.editScore.setSelected(false);
+            updateScore(this.editScore);
+        }
 
+        editScore.setSelected(true);
+        this.editScore = editScore;
+        updateScore(this.editScore);
 
+        setInputMode(INPUTMODE_EDIT_SCORE);
+    }
 
+    public void setInputMode(int inputMode) {
+        this.inputMode = inputMode;
+    }
 
     public void setCurrentScore(int score) {
         this.currentScore.setValue(score);
@@ -175,72 +226,90 @@ public class MainViewModel extends AndroidViewModel {
         }
     }
 
-    public void setShowMenuDialog(Boolean showMenuDialog) {
-        this.showMenuDialog.setValue(showMenuDialog);
-
+    public void setSwap(boolean onOff) {
+        isSwappingAllowed.setValue(onOff);
+        // TODO: 10.08.2020 Swapbutton
     }
 
-    private int getActivePlayerId() {
-        return getPlayers().getValue().get(activePlayer.getValue()).getId();
-    }
+
+
+    //</editor-fold>
+
 
     public void onClickSubmit() {
 
-        setSwapOff();
-
-        //Score Speichern
+        setSwap(false);
         int score = getCurrentScore().getValue();
-        int activePlayer = getActivePlayer().getValue();
+        switch (inputMode) {
+            case INPUTMODE_EDIT_SCORE:
 
-        insertScore(new Score(getActivePlayerId(), score));
+                editScore.setScore(score);
+                editScore.setSelected(false);
+                updateScore(editScore);
+                setInputMode(INPUTMODE_DEFAULT);
+                setCurrentScore(0);
+                break;
 
-        //update Player Values
-        Player player = getPlayers().getValue().get(activePlayer);
-        player.setScore(player.getScore() + score);
-        player.setLastScore(score);
-        updatePlayer(player);
+            default:
+                //Score Speichern
+                int activePlayer = getActivePlayer().getValue();
+
+                insertScore(new Score(getActivePlayerId(), score));
+
+                //update Player Values
+                Player player = getPlayers().getValue().get(activePlayer);
+                player.setScore(player.getScore() + score);
+                player.setLastScore(score);
+                updatePlayer(player);
 
 
-        //Spieler weiterschalten
-        if (activePlayer < getPlayerLimit().getValue() - 1) {
-            activePlayer++;
-        } else {
-            activePlayer = 0;
+                //Spieler weiterschalten
+                if (activePlayer < getPlayerLimit().getValue() - 1) {
+                    activePlayer++;
+                } else {
+                    activePlayer = 0;
+                }
+
+
+                setCurrentScore(0);
+                setActivePlayer(activePlayer);
         }
-
-//        setPlayerButtons(activePlayer);
-
-        setCurrentScore(0);
-        setActivePlayer(activePlayer);
 
 
     }
 
     public void onClickDigit(int digit) {
-        int score;
-        score = getCurrentScore().getValue();
-        score = score * 10 + digit;
-        setCurrentScore(score);
+        int number;
+        number = getCurrentScore().getValue();
+        number = number * 10 + digit;
+        setCurrentScore(number);
+
+
+
+     /*   switch (inputMode) {
+            case INPUTMODE_EDIT_SCORE:
+                int score = getCurrentScore().getValue();
+                editScore.setScore(score);
+                updateScore(editScore);
+                break;
+
+            default:
+                setCurrentScore(number);
+                break;
+
+        }*/
+
 
     }
 
-    public void setSwapOff() {
-        istSwappingAllowed.setValue(false);
-        //TODO Swapbutton ausschalten}
-    }
-
-    public void setSwapOn() {
-        istSwappingAllowed.setValue(true);
-        //TODO swapbutton einschalten
-    }
-
-    public void resetScores() {
+    public void newGame() {
         List<Player> players_temp = players.getValue();
         for (Player player : players_temp) {
             player.setScore(0);
             updatePlayer(player);
         }
-        setSwapOn();
+        setSwap(true);
+        setActivePlayer(0);
         deleteAllScores();
     }
 
