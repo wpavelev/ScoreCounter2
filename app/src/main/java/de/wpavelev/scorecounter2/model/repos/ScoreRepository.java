@@ -21,6 +21,7 @@ public class ScoreRepository {
     private ScoreDao scoreDao;
 
     private LiveData<List<Score>> allScores;
+    private LiveData<List<Integer>> scoreSums;
 
 
     public ScoreRepository(Application application) {
@@ -50,6 +51,10 @@ public class ScoreRepository {
         return allScores;
     }
 
+    public LiveData<List<Integer>> getScoreSum(int[] player) {
+        return scoreDao.getScoreFrom(player);
+
+    }
 
     private static class InsertScoreAsynchTask extends AsyncTask<Score, Void, Void> {
 

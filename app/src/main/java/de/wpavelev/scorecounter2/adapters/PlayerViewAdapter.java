@@ -8,11 +8,13 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,7 +22,9 @@ import com.example.scorecounter2.R;
 import com.example.scorecounter2.databinding.ItemPlayerViewRecyclerBinding;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.model.data.Score;
@@ -41,12 +45,14 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
     }
 
 
+    SparseArray<Integer> mainScores = new SparseArray<>();
+
     private String TAG = "PlayerViewAdapter";
 
     /**
      * Liste der Spieler, die angezeigt werden
      */
-    private List<Player> playerList;
+    //private List<Player> playerList;
 
     /**
      * Listen von Scores, die in Tabellenform angezeigt werden
@@ -71,29 +77,66 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
     private ClickListener clickListener;
     private LongClickListener longClickListener;
 
+    LifecycleOwner lifecycleOwner;
+    LiveData<List<Player>> playerListLiveData;
+    LiveData<Boolean> showScoresLiveData;
+
+    List<Player> playerList = new ArrayList<>();
+
+
 
     private Context context;
 
-    public PlayerViewAdapter(Context context, List<Player> playerList) {
+    public PlayerViewAdapter(Context context,
+                             LifecycleOwner lifecycleOwner,
+                             LiveData<List<Player>> playerListLiveData,
+                             LiveData<List<Score>> scoreListLiveData,
+                             LiveData<Boolean> showScoresLiveData) {
 
         this.context = context;
 
-        this.playerList = playerList;
-        Log.d(TAG, "PlayerViewAdapter: dataset_size " + playerList.size());
+        this.lifecycleOwner = lifecycleOwner;
+
+        this.showScoresLiveData = showScoresLiveData;
+
+        this.playerListLiveData = playerListLiveData;
+
+        playerListLiveData.observe(lifecycleOwner, players -> playerList = new ArrayList<>(players));
+
+        scoreListLiveData.observe(lifecycleOwner, scoreList -> setPlayerScores(scoreList));
+
+
 
 
     }
 
 
-    public void setPlayerList(List<Player> playerList) {
-        this.playerList = playerList;
 
+    private void setPlayerScores(List<Score> scoreList) {
+        this.playerScores = convertScoreListToSparseArray(scoreList);
         notifyDataSetChanged();
     }
 
-    public void setPlayerScores(SparseArray<List<Score>> playerScores) {
-        this.playerScores = playerScores;
-        notifyDataSetChanged();
+    private SparseArray<List<Score>> convertScoreListToSparseArray(List<Score> scoreList) {
+
+        mainScores = new SparseArray<>();
+        SparseArray<List<Score>> sparseArray = new SparseArray<>();
+        Set<Integer> playerIdExists = new HashSet<>();
+        for (Score score : scoreList) {
+            int playerId = score.getPlayer();
+
+            if (!playerIdExists.contains(playerId)) {
+                sparseArray.put(playerId, new ArrayList<>());
+                mainScores.put(playerId, 0);
+            }
+            playerIdExists.add(playerId);
+            sparseArray.get(playerId).add(score);
+            mainScores.put(playerId, mainScores.get(playerId) + score.getScore());
+
+
+        }
+
+        return sparseArray;
     }
 
     public void setPlayerCount(int playerCount) {
@@ -108,22 +151,13 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         notifyDataSetChanged();
     }
 
-    public void setClickListener(ClickListener clickListener) {
+    public void setListener(ClickListener clickListener, LongClickListener longClickListener, ScoreChangeListener scoreChangeListener) {
         this.clickListener = clickListener;
-    }
-
-    public void setLongClickListener(LongClickListener longClickListener) {
         this.longClickListener = longClickListener;
-    }
-
-    public void setScoreChangeListener(ScoreChangeListener scoreChangeListener) {
         this.scoreChangeListener = scoreChangeListener;
     }
 
-    public void setEditScore(int score) {
-        this.editingScore = score;
-        notifyDataSetChanged();
-    }
+
 
     @NonNull
     @Override
@@ -144,11 +178,17 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Player player = playerList.get(position);
         holder.setPlayerPosition(position, activePlayer);
+        if (mainScores != null && mainScores.size() >= player.getId()) {
+            player.setScore(mainScores.get(player.getId()));
+        }
         holder.bindPlayer(player);
 
 
+
+
+
         if (playerScores != null) {
-            holder.bindPlayerScore(playerScores.get(player.getId()));
+            holder.setPlayerScoreList(playerScores.get(player.getId()));
         }
 
         if (editingScore != -1) {
@@ -162,7 +202,9 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
     @Override
     public int getItemCount() {
+
         return playerList.size();
+
     }
 
 
@@ -177,6 +219,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         PlayerScoreAdapter playerScoreAdapter;
 
 
+
         Drawable border;
 
 
@@ -185,8 +228,11 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
             this.viewHolderBinding = binding;
 
+
+
+
             layout = binding.itemPlayerViewRecyclerView;
-            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (-0.5 + playerCount));
+            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (0.5 + playerCount));
             layout.setMaxWidth(layoutWidth);
             layout.setMinWidth(layoutWidth);
 
@@ -202,12 +248,15 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
             playerScoreAdapter = new PlayerScoreAdapter(context);
 
-            playerScoreAdapter.setClickListener((v, score) -> Toast.makeText(context, ""+score.getScore(), Toast.LENGTH_SHORT).show());
+            playerScoreAdapter.setClickListener((v, score) -> Toast.makeText(context, "" + score.getScore(), Toast.LENGTH_SHORT).show());
 
             playerScoreAdapter.setLongClickListener((v, score) -> scoreChangeListener.onScoreChange(score));
 
 
             recyclerPlayerScore.setAdapter(playerScoreAdapter);
+
+            showScoresLiveData.observe(lifecycleOwner, aBoolean -> binding.setShowScores(aBoolean));
+
 
 
             if (clickListener != null) {
@@ -219,26 +268,23 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
             if (longClickListener != null) {
                 itemView.setOnLongClickListener(this);
-            }else {
+            } else {
                 Log.d(TAG, "MyViewHolder: longClickListener is null");
 
             }
 
 
-
         }
 
         public void bindPlayer(Player player) {
-            this.viewHolderBinding.setPlayer(player);
-
+            viewHolderBinding.setPlayer(player);
         }
-
         public void setEditScore(int score) {
             playerScoreAdapter.setEditScore(score);
 
         }
 
-        public void bindPlayerScore(List<Score> playerScores) {
+        public void setPlayerScoreList(List<Score> playerScores) {
             if (playerScores != null) {
                 playerScoreAdapter.setDataset(playerScores);
                 playerScoreAdapter.notifyDataSetChanged();
@@ -256,7 +302,6 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         }
 
         public void setPlayerPosition(int playerPosition, int activePlayer) {
-
 
             int arrayPosition;
             if (playerPosition >= 0) {
@@ -281,6 +326,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
 
         }
+
 
 
         @Override

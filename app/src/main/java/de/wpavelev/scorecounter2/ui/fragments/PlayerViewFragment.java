@@ -52,23 +52,8 @@ public class PlayerViewFragment extends Fragment{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         com.example.scorecounter2.databinding.FragmentPlayerViewBinding binding = FragmentPlayerViewBinding.inflate(inflater, container, false);
-
-        View view = binding.getRoot();
-
         recyclerView = binding.playerViewRecycler;
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
-
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new PlayerViewAdapter(getContext(), new ArrayList<>());
-        adapter.setClickListener((v, position) -> {
-
-        });
-        adapter.setLongClickListener((v, position) -> showPlayerNamesDialog(position));
-
-        adapter.setScoreChangeListener(score -> viewModel.setEditScore(score));
-
-        recyclerView.setAdapter(adapter);
-
+        View view = binding.getRoot();
 
         return view;
 
@@ -78,24 +63,27 @@ public class PlayerViewFragment extends Fragment{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
 
-        //aktualisiert die Liste der Spieler im Adapter
-        viewModel.getPlayerLimited().observe(getViewLifecycleOwner(), list -> {
-            if (list == null) {
-                adapter.setPlayerList(new ArrayList<>());
-            }
+        recyclerView.setLayoutManager(layoutManager);
+        adapter = new PlayerViewAdapter(
+                getContext(),
+                getViewLifecycleOwner(),
+                viewModel.getPlayerLimited(),
+                viewModel.getScores(),
+                viewModel.getShowScore());
 
-            adapter.setPlayerList(list);
+        adapter.setListener(
+                (v, position) -> {viewModel.setActivePlayer(position);},
+                (v, position) -> showPlayerNamesDialog(position),
+                score -> viewModel.setEditScore(score));
 
-        });
 
-        viewModel.getScores().observe(getViewLifecycleOwner(), scoreList -> {
-            Log.d(TAG, "onActivityCreated: Observer trigger!");
-            adapter.setPlayerScores(convertScoreListToSparseArray(scoreList));
+        recyclerView.setAdapter(adapter);
 
-        });
 
 
         //sagt dem Adapter, wie viele Spieler eingestellt sind
@@ -112,22 +100,6 @@ public class PlayerViewFragment extends Fragment{
 
     }
 
-    private SparseArray<List<Score>> convertScoreListToSparseArray(List<Score> scoreList) {
-        SparseArray<List<Score>> sparseArray = new SparseArray<>();
-        Set<Integer> playerIdExists = new HashSet<>();
-        for (Score score : scoreList) {
-            int playerId = score.getPlayer();
-
-            if (!playerIdExists.contains(playerId)) {
-                sparseArray.put(playerId, new ArrayList<>());
-            }
-            playerIdExists.add(playerId);
-            sparseArray.get(playerId).add(score);
-
-        }
-
-        return sparseArray;
-    }
 
     private void  showPlayerNamesDialog(int playerPosition) {
         NameListDialog dialog = new NameListDialog(new NameListDialog.onClickListener() {

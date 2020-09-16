@@ -39,8 +39,10 @@ public class MainViewModel extends AndroidViewModel {
     private LiveData<List<Player>> players;
     private LiveData<List<Score>> scores;
 
-    TextView textViewScore;
-
+    /**
+     * Gibt an, ob die Scores in der UI angezeigt werden.
+     */
+    private MutableLiveData<Boolean> showScore = new MutableLiveData<>();
 
     /**
      * Die Zahl, die gerade eingegeben wird / wurde. Diese wird einem Spieler als Punktzahl der a
@@ -103,6 +105,7 @@ public class MainViewModel extends AndroidViewModel {
         currentScore.setValue(0);
         longClickPlayer.setValue(-1);
         activePlayer.setValue(0);
+        showScore.setValue(false);
 
         Log.w(TAG, "MainViewModel: playerLimit wird zu Beginn auf 4 gesetzt");
         setPlayerLimit(4);
@@ -115,7 +118,9 @@ public class MainViewModel extends AndroidViewModel {
     //<editor-fold desc="Getter">
 
 
-
+    public MutableLiveData<Boolean> getShowScore() {
+        return showScore;
+    }
 
     public MutableLiveData<Integer> getCurrentScore() {
         return currentScore;
@@ -143,15 +148,13 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<List<Player>> getPlayerLimited() {
         return Transformations.switchMap(playerLimit, limit -> Transformations.map(getPlayers(), list -> {
-
                     int min = Math.min(limit, list.size());
                     return list.subList(0, min);
-
                 }
-
         ));
 
     }
+
 
     public void setShowMenuDialog(Boolean showMenuDialog) {
         this.showMenuDialog.setValue(showMenuDialog);
@@ -166,8 +169,8 @@ public class MainViewModel extends AndroidViewModel {
     //<editor-fold desc="Setter">
 
 
-    public void setTextViewScore(TextView textViewScore) {
-        this.textViewScore = textViewScore;
+    public void setShowScore(Boolean showScore) {
+        this.showScore.setValue(showScore);
     }
 
     public void setEditScore(Score editScore) {
@@ -259,7 +262,7 @@ public class MainViewModel extends AndroidViewModel {
                 //update Player Values
                 Player player = getPlayers().getValue().get(activePlayer);
                 player.setScore(player.getScore() + score);
-                player.setLastScore(score);
+
                 updatePlayer(player);
 
 
@@ -274,6 +277,7 @@ public class MainViewModel extends AndroidViewModel {
                 setCurrentScore(0);
                 setActivePlayer(activePlayer);
         }
+
 
 
     }

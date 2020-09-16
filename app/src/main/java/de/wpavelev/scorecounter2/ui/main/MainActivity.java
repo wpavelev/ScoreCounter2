@@ -94,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
         DisplayUtil.setDisplayWidthPx(getScreenWidthInPXs(this));
 
 

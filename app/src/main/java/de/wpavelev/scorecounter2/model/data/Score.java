@@ -12,13 +12,13 @@ public class Score {
 
     boolean isSelected;
 
+    private int score;
+
     public Score(int player, int score) {
         this.score = score;
         this.player = player;
     }
 
-
-    private int score;
 
     public int getId() {
         return id;
