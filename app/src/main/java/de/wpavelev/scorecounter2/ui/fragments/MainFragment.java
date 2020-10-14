@@ -83,6 +83,9 @@ public class MainFragment extends Fragment {
             viewModel.setShowScore(!showScore);
         });
 
+
+
+
         return view;
     }
 

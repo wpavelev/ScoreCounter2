@@ -72,9 +72,15 @@ public class MainViewModel extends AndroidViewModel {
      */
     private MutableLiveData<Boolean> isSwappingAllowed = new MutableLiveData<>();
 
+    /**
+     * Indikator für das Zeigen der Score der Spieler (Endscore)
+     */
+    private MutableLiveData<Boolean> isShowMainScore = new MutableLiveData<>();
+
 
     private SingleLiveEvent<Boolean> showEditNameDialog = new SingleLiveEvent<>();
     private SingleLiveEvent<Boolean> showMenuDialog = new SingleLiveEvent<>();
+
 
     /**
      * Die Zuordnung des Scores zur Datenbank. Hier wird der neue Wert eingefügt, in die Datenbank
@@ -106,6 +112,8 @@ public class MainViewModel extends AndroidViewModel {
         longClickPlayer.setValue(-1);
         activePlayer.setValue(0);
         showScore.setValue(false);
+        isShowMainScore.setValue(true);
+
 
         Log.w(TAG, "MainViewModel: playerLimit wird zu Beginn auf 4 gesetzt");
         setPlayerLimit(4);
@@ -117,6 +125,12 @@ public class MainViewModel extends AndroidViewModel {
 
     //<editor-fold desc="Getter">
 
+
+
+
+    public MutableLiveData<Boolean> getIsShowMainScore() {
+        return isShowMainScore;
+    }
 
     public MutableLiveData<Boolean> getShowScore() {
         return showScore;
@@ -168,6 +182,13 @@ public class MainViewModel extends AndroidViewModel {
 
     //<editor-fold desc="Setter">
 
+
+
+
+
+    public void setIsShowMainScore(Boolean showMainScore) {
+        this.isShowMainScore.setValue(showMainScore);
+    }
 
     public void setShowScore(Boolean showScore) {
         this.showScore.setValue(showScore);
@@ -304,6 +325,11 @@ public class MainViewModel extends AndroidViewModel {
         }*/
 
 
+    }
+
+    public void onCLickQwirkle() {
+        setCurrentScore(currentScore.getValue()+12);
+        // TODO: 02.10.2020 Qwirkle dem SPieler dazuaddieren
     }
 
     public void newGame() {

@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -33,16 +32,20 @@ import de.wpavelev.scorecounter2.util.DisplayUtil;
 public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.MyViewHolder> {
 
     public interface ClickListener {
+
         void onItemClick(View v, int position);
     }
-
     public interface LongClickListener {
+
         void onItemLongClick(View v, int position);
     }
-
     public interface ScoreChangeListener {
+
         void onScoreChange(Score score);
     }
+
+    protected boolean showMainScore = true;
+
 
 
     SparseArray<Integer> mainScores = new SparseArray<>();
@@ -77,11 +80,12 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
     private ClickListener clickListener;
     private LongClickListener longClickListener;
 
-    LifecycleOwner lifecycleOwner;
-    LiveData<List<Player>> playerListLiveData;
-    LiveData<Boolean> showScoresLiveData;
+    private LifecycleOwner lifecycleOwner;
+    private LiveData<List<Player>> playerListLiveData;
+    private LiveData<Boolean> showScoresLiveData;
+    private LiveData<Boolean> showMainScoreLiveData;
 
-    List<Player> playerList = new ArrayList<>();
+    private List<Player> playerList = new ArrayList<>();
 
 
 
@@ -91,7 +95,8 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
                              LifecycleOwner lifecycleOwner,
                              LiveData<List<Player>> playerListLiveData,
                              LiveData<List<Score>> scoreListLiveData,
-                             LiveData<Boolean> showScoresLiveData) {
+                             LiveData<Boolean> showScoresLiveData,
+                             LiveData<Boolean> showMainScoreLiveData) {
 
         this.context = context;
 
@@ -101,9 +106,13 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
         this.playerListLiveData = playerListLiveData;
 
+        this.showMainScoreLiveData = showMainScoreLiveData;
+
         playerListLiveData.observe(lifecycleOwner, players -> playerList = new ArrayList<>(players));
 
         scoreListLiveData.observe(lifecycleOwner, scoreList -> setPlayerScores(scoreList));
+
+        showMainScoreLiveData.observe(lifecycleOwner, aBoolean -> setShowPlayerMainScor(aBoolean));
 
 
 
@@ -157,7 +166,10 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         this.scoreChangeListener = scoreChangeListener;
     }
 
-
+    public void setShowPlayerMainScor(boolean showPlayerMainScore) {
+        this.showMainScore = showPlayerMainScore;
+        notifyDataSetChanged();
+    }
 
     @NonNull
     @Override
@@ -181,9 +193,10 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         if (mainScores != null && mainScores.size() >= player.getId()) {
             player.setScore(mainScores.get(player.getId()));
         }
-        holder.bindPlayer(player);
+        holder.setPlayer(player);
 
 
+        holder.setShowMainScore(showMainScore);
 
 
 
@@ -217,8 +230,6 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         private ItemPlayerViewRecyclerBinding viewHolderBinding;
 
         PlayerScoreAdapter playerScoreAdapter;
-
-
 
         Drawable border;
 
@@ -276,12 +287,16 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
         }
 
-        public void bindPlayer(Player player) {
+        public void setPlayer(Player player) {
             viewHolderBinding.setPlayer(player);
         }
         public void setEditScore(int score) {
             playerScoreAdapter.setEditScore(score);
 
+        }
+
+        public void setShowMainScore(boolean showMainScore) {
+            viewHolderBinding.setShowMainScore(showMainScore);
         }
 
         public void setPlayerScoreList(List<Score> playerScores) {

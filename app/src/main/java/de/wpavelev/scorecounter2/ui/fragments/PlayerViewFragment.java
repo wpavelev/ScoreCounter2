@@ -74,7 +74,8 @@ public class PlayerViewFragment extends Fragment{
                 getViewLifecycleOwner(),
                 viewModel.getPlayerLimited(),
                 viewModel.getScores(),
-                viewModel.getShowScore());
+                viewModel.getShowScore(),
+                viewModel.getIsShowMainScore());
 
         adapter.setListener(
                 (v, position) -> {viewModel.setActivePlayer(position);},
@@ -83,7 +84,6 @@ public class PlayerViewFragment extends Fragment{
 
 
         recyclerView.setAdapter(adapter);
-
 
 
         //sagt dem Adapter, wie viele Spieler eingestellt sind

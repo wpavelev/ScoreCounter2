@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="player"
             type="de.wpavelev.scorecounter2.model.data.Player" />
@@ -12,7 +11,9 @@
             name="showScores"
             type="boolean" />
 
-
+        <variable
+            name="showMainScore"
+            type="boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,6 +44,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:text="@{String.valueOf(player.score)}"
+            app:visibleIf="@{showMainScore}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"
             app:layout_constraintEnd_toEndOf="@+id/item_player_view_recycler_player_name"
             app:layout_constraintStart_toStartOf="@+id/item_player_view_recycler_player_name"

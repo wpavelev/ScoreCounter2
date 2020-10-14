@@ -121,13 +121,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.menu_show_scores:
+                viewModel.setIsShowMainScore(!viewModel.getIsShowMainScore().getValue());
+                if (viewModel.getIsShowMainScore().getValue()) {
+                    Log.d(TAG, "onOptionsItemSelected: getIsShowMainScore is ture");
+
+                } else {
+                    Log.d(TAG, "onOptionsItemSelected: getIsShowMainScore is false");
+                }
+                break;
             case R.id.menu_open_menu:
                 viewModel.setShowMenuDialog(true);
+                break;
             default:
                 return super.onOptionsItemSelected(item);
 
         }
-
+        return super.onOptionsItemSelected(item);
 
     }
 
