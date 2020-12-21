@@ -2,7 +2,6 @@ package de.wpavelev.scorecounter2.ui.fragments;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,18 +15,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scorecounter2.databinding.FragmentPlayerViewBinding;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import de.wpavelev.scorecounter2.adapters.PlayerViewAdapter;
 import de.wpavelev.scorecounter2.dialogs.InsertNameDialog;
 import de.wpavelev.scorecounter2.dialogs.NameListDialog;
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
-import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class PlayerViewFragment extends Fragment{
@@ -53,9 +47,8 @@ public class PlayerViewFragment extends Fragment{
 
         com.example.scorecounter2.databinding.FragmentPlayerViewBinding binding = FragmentPlayerViewBinding.inflate(inflater, container, false);
         recyclerView = binding.playerViewRecycler;
-        View view = binding.getRoot();
 
-        return view;
+        return binding.getRoot();
 
     }
 
@@ -78,12 +71,9 @@ public class PlayerViewFragment extends Fragment{
                 viewModel.getIsShowMainScore());
 
         adapter.setListener(
-                (v, position) -> {viewModel.setActivePlayer(position);},
+                (v, position) -> viewModel.setActivePlayer(position),
                 (v, position) -> showPlayerNamesDialog(position),
                 score -> viewModel.setEditScore(score));
-
-
-        recyclerView.setAdapter(adapter);
 
 
         //sagt dem Adapter, wie viele Spieler eingestellt sind
@@ -95,11 +85,13 @@ public class PlayerViewFragment extends Fragment{
             adapter.setActivePlayer(integer);
             recyclerView.smoothScrollToPosition(integer);
         });
+        recyclerView.setAdapter(adapter);
+
+
 
 
 
     }
-
 
     private void  showPlayerNamesDialog(int playerPosition) {
         NameListDialog dialog = new NameListDialog(new NameListDialog.onClickListener() {
@@ -113,6 +105,7 @@ public class PlayerViewFragment extends Fragment{
                 Player player = Objects.requireNonNull(viewModel.getPlayers().getValue()).get(playerPosition);
                 player.setName(name.getName());
                 viewModel.updatePlayer(player);
+                adapter.notifyDataSetChanged();
 
 
             }

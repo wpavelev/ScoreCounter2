@@ -41,7 +41,7 @@
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
             android:contentDescription="Back"
-
+            android:onClick="@{()->viewmodel.undoLastAction()}"
             android:padding="@dimen/num_pad_image_button_padding"
             android:scaleType="centerInside"
             android:src="@drawable/back_icon_50"

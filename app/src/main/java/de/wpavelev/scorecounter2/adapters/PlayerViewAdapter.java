@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.util.SparseArray;
+import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
 
 
-    SparseArray<Integer> mainScores = new SparseArray<>();
+    SparseIntArray mainScores = new SparseIntArray();
 
     private String TAG = "PlayerViewAdapter";
 
@@ -110,9 +111,9 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
         playerListLiveData.observe(lifecycleOwner, players -> playerList = new ArrayList<>(players));
 
-        scoreListLiveData.observe(lifecycleOwner, scoreList -> setPlayerScores(scoreList));
+        scoreListLiveData.observe(lifecycleOwner, this::setPlayerScores);
 
-        showMainScoreLiveData.observe(lifecycleOwner, aBoolean -> setShowPlayerMainScor(aBoolean));
+        showMainScoreLiveData.observe(lifecycleOwner, this::setShowPlayerMainScor);
 
 
 
@@ -128,7 +129,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
     private SparseArray<List<Score>> convertScoreListToSparseArray(List<Score> scoreList) {
 
-        mainScores = new SparseArray<>();
+        mainScores = new SparseIntArray();
         SparseArray<List<Score>> sparseArray = new SparseArray<>();
         Set<Integer> playerIdExists = new HashSet<>();
         for (Score score : scoreList) {
@@ -195,10 +196,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         }
         holder.setPlayer(player);
 
-
         holder.setShowMainScore(showMainScore);
-
-
 
         if (playerScores != null) {
             holder.setPlayerScoreList(playerScores.get(player.getId()));
@@ -303,7 +301,7 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
             if (playerScores != null) {
                 playerScoreAdapter.setDataset(playerScores);
                 playerScoreAdapter.notifyDataSetChanged();
-                Log.d(TAG, "playerscores: ");
+                Log.d(TAG, "setPlayerScoreList");
                 for (Score playerScore : playerScores) {
                     Log.d(TAG, "score.player=" + playerScore.getPlayer() + " " +
                             "score.score=" + playerScore.getScore());

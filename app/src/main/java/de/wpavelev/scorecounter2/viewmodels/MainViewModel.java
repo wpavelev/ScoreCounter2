@@ -2,20 +2,19 @@ package de.wpavelev.scorecounter2.viewmodels;
 
 import android.app.Application;
 import android.util.Log;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import com.example.scorecounter2.R;
-
+import java.util.ArrayList;
 import java.util.List;
 
+import de.wpavelev.scorecounter2.model.data.PlayerAction;
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
+import de.wpavelev.scorecounter2.model.repos.PlayerActionRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
@@ -31,13 +30,15 @@ public class MainViewModel extends AndroidViewModel {
     public static final int INPUTMODE_EDIT_SCORE = 1;
 
 
-    private NameRepository nameRepository;
-    private PlayerRepository playerRepository;
-    private ScoreRepository scoreRepository;
+    private NameRepository mNameRepository;
+    private PlayerRepository mPlayerRepository;
+    private ScoreRepository mScoreRepository;
+    private PlayerActionRepository mPlayerActionRepository;
 
-    private LiveData<List<Name>> names;
-    private LiveData<List<Player>> players;
-    private LiveData<List<Score>> scores;
+    private LiveData<List<Name>> mNames;
+    private LiveData<List<Player>> mPlayers;
+    private LiveData<List<Score>> mScores;
+    private LiveData<List<PlayerAction>> mPlayerActions;
 
     /**
      * Gibt an, ob die Scores in der UI angezeigt werden.
@@ -77,7 +78,6 @@ public class MainViewModel extends AndroidViewModel {
      */
     private MutableLiveData<Boolean> isShowMainScore = new MutableLiveData<>();
 
-
     private SingleLiveEvent<Boolean> showEditNameDialog = new SingleLiveEvent<>();
     private SingleLiveEvent<Boolean> showMenuDialog = new SingleLiveEvent<>();
 
@@ -86,7 +86,7 @@ public class MainViewModel extends AndroidViewModel {
      * Die Zuordnung des Scores zur Datenbank. Hier wird der neue Wert eingefügt, in die Datenbank
      * geschickt und geupdatet.
      */
-    private Score editScore = new Score(0,0);
+    private Score editScore = new Score(0, 0);
 
 
     /**
@@ -96,16 +96,19 @@ public class MainViewModel extends AndroidViewModel {
      */
     private int inputMode = INPUTMODE_DEFAULT;
 
+
     public MainViewModel(@NonNull Application application) {
         super(application);
 
-        playerRepository = new PlayerRepository(application);
-        nameRepository = new NameRepository(application);
-        scoreRepository = new ScoreRepository(application);
+        mPlayerRepository = new PlayerRepository(application);
+        mNameRepository = new NameRepository(application);
+        mScoreRepository = new ScoreRepository(application);
+        mPlayerActionRepository = new PlayerActionRepository(application);
 
-        names = nameRepository.getAllNames();
-        players = playerRepository.getAllPlayers();
-        scores = scoreRepository.getAllScores();
+        mNames = mNameRepository.getAllNames();
+        mPlayers = mPlayerRepository.getAllPlayers();
+        mScores = mScoreRepository.getAllScores();
+        mPlayerActions = mPlayerActionRepository.getAllPlayerActions();
 
 
         currentScore.setValue(0);
@@ -124,8 +127,6 @@ public class MainViewModel extends AndroidViewModel {
 
 
     //<editor-fold desc="Getter">
-
-
 
 
     public MutableLiveData<Boolean> getIsShowMainScore() {
@@ -181,9 +182,6 @@ public class MainViewModel extends AndroidViewModel {
     //</editor-fold>
 
     //<editor-fold desc="Setter">
-
-
-
 
 
     public void setIsShowMainScore(Boolean showMainScore) {
@@ -256,9 +254,19 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-
     //</editor-fold>
 
+    public void undoLastAction() {
+        Log.d(TAG, "undoLastAction");
+
+
+        PlayerAction playerAction = getPlayerActions().getValue().get(getPlayerActions().getValue().size() - 1);
+        if (playerAction.getScoreId() == -1) {
+            Score score = getScores().getValue().get(0);
+            deleteScore(score);
+        }
+
+    }
 
     public void onClickSubmit() {
 
@@ -267,9 +275,16 @@ public class MainViewModel extends AndroidViewModel {
         switch (inputMode) {
             case INPUTMODE_EDIT_SCORE:
 
+                int oldValue = editScore.getScore();
+                int newValue = score;
+                int scoreDif = newValue - oldValue;
+
                 editScore.setScore(score);
                 editScore.setSelected(false);
+
+                insertPlayerAction(new PlayerAction(scoreDif, editScore.getPlayer(), editScore.getId()));
                 updateScore(editScore);
+
                 setInputMode(INPUTMODE_DEFAULT);
                 setCurrentScore(0);
                 break;
@@ -278,6 +293,7 @@ public class MainViewModel extends AndroidViewModel {
                 //Score Speichern
                 int activePlayer = getActivePlayer().getValue();
 
+                insertPlayerAction(new PlayerAction(score, getActivePlayerId()));
                 insertScore(new Score(getActivePlayerId(), score));
 
                 //update Player Values
@@ -298,7 +314,6 @@ public class MainViewModel extends AndroidViewModel {
                 setCurrentScore(0);
                 setActivePlayer(activePlayer);
         }
-
 
 
     }
@@ -328,12 +343,12 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void onCLickQwirkle() {
-        setCurrentScore(currentScore.getValue()+12);
+        setCurrentScore(currentScore.getValue() + 12);
         // TODO: 02.10.2020 Qwirkle dem SPieler dazuaddieren
     }
 
     public void newGame() {
-        List<Player> players_temp = players.getValue();
+        List<Player> players_temp = mPlayers.getValue();
         for (Player player : players_temp) {
             player.setScore(0);
             updatePlayer(player);
@@ -341,80 +356,106 @@ public class MainViewModel extends AndroidViewModel {
         setSwap(true);
         setActivePlayer(0);
         deleteAllScores();
+        deleteAllPlayerActions();
     }
 
     //<editor-fold desc="Names (Repo)">
     public LiveData<List<Name>> getNames() {
-        return names;
+        return mNames;
     }
 
     public void insertName(Name name) {
-        nameRepository.insert(name);
+        mNameRepository.insert(name);
 
     }
 
     public void updateName(Name name) {
-        nameRepository.update(name);
+        mNameRepository.update(name);
 
     }
 
     public void deleteName(Name name) {
-        nameRepository.delete(name);
+        mNameRepository.delete(name);
 
     }
 
     public void deleteAllNames() {
-        nameRepository.deleteAll();
+        mNameRepository.deleteAll();
     }
     //</editor-fold>
 
     //<editor-fold desc="Players (Repo)">
     public void insertPlayer(Player player) {
-        playerRepository.insert(player);
+        mPlayerRepository.insert(player);
     }
 
     public void updatePlayer(Player player) {
-        playerRepository.update(player);
+        mPlayerRepository.update(player);
     }
 
     public void deletePlayer(Player player) {
-        playerRepository.delete(player);
+        mPlayerRepository.delete(player);
     }
 
     public void deleteAllPlayer() {
-        playerRepository.deleteAll();
+        mPlayerRepository.deleteAll();
     }
 
     public LiveData<List<Player>> getPlayers() {
-        return players;
+        return mPlayers;
     }
     //</editor-fold>
 
     //<editor-fold desc="Scores (Repo)">
 
     public LiveData<List<Score>> getScores() {
-        return scores;
+        return mScores;
     }
 
     public void insertScore(Score score) {
-        scoreRepository.insert(score);
+        mScoreRepository.insert(score);
     }
 
     public void updateScore(Score score) {
-        scoreRepository.update(score);
+
+        mScoreRepository.update(score);
     }
 
     public void deleteScore(Score score) {
-        scoreRepository.delete(score);
+        mScoreRepository.delete(score);
     }
 
     public void deleteAllScores() {
-        scoreRepository.deleteAll();
+        mScoreRepository.deleteAll();
 
     }
 
 
     //</editor-fold>
 
+    //<editor-fold desc="PlayerAction (Repo)">
+
+    public LiveData<List<PlayerAction>> getPlayerActions() {
+        return mPlayerActions;
+    }
+
+    public void insertPlayerAction(PlayerAction playerAction) {
+        mPlayerActionRepository.insert(playerAction);
+    }
+
+    public void updatePlayerAction(PlayerAction playerAction) {
+        mPlayerActionRepository.update(playerAction);
+
+    }
+    public void deletePlayerAction(PlayerAction playerAction) {
+        mPlayerActionRepository.delete(playerAction);
+
+    }
+    public void deleteAllPlayerActions() {
+        mPlayerActionRepository.deleteAll();
+
+    }
+
+    //</editor-fold>
 
 }

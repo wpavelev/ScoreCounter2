@@ -20,7 +20,7 @@ public class NameRepository {
 
     public NameRepository(Application application) {
         MyDatabase database = MyDatabase.getInstance(application);
-        nameDao = database.nameDao();
+        nameDao = database.mNameDao();
         allNames = nameDao.getAllNames();
     }
 

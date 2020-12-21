@@ -19,12 +19,12 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.scorecounter2.R;
 import com.example.scorecounter2.databinding.ActivityMainBinding;
-import com.facebook.stetho.Stetho;
 
 import de.wpavelev.scorecounter2.dialogs.MainMenuDialog;
 import de.wpavelev.scorecounter2.dialogs.PlayerNumberDialog;
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
+import de.wpavelev.scorecounter2.model.data.PlayerAction;
 import de.wpavelev.scorecounter2.ui.fragments.MainFragment;
 import de.wpavelev.scorecounter2.util.DisplayUtil;
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
@@ -46,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
 
         int mainContainer = binding.mainActivityContainer.getId();
 
-        // TODO: 10.08.2020 Stetho debug raus
-        Stetho.initializeWithDefaults(this);
 
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
@@ -89,6 +87,15 @@ public class MainActivity extends AppCompatActivity {
             }
 
         });
+
+        viewModel.getPlayerActions().observe(this, playerActions -> {
+            if (playerActions.size() == 0) {
+                viewModel.insertPlayerAction(new PlayerAction(0,0));
+            }
+
+        });
+
+
 
 
 

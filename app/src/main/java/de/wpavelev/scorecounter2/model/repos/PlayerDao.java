@@ -29,10 +29,6 @@ public interface PlayerDao {
     @Query("SELECT * FROM Player ORDER BY id")
     LiveData<List<Player>> getAllPlayer();
 
-    @Query("SELECT * FROM Player WHERE id = :playerId LIMIT 1")
-    LiveData<Player> getPlayer(int playerId);
 
-    @Query("SELECT * FROM Player WHERE name LIKE :playerName LIMIT 1")
-    LiveData<Player> getPlayerByName(String playerName);
 
 }

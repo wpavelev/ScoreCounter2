@@ -33,6 +33,9 @@ public interface ScoreDao {
     @Query("SELECT SUM(score) FROM Score WHERE player IN(:player)")
     LiveData<List<Integer>>getScoreFrom(int[] player);
 
+    @Query("SELECT * FROM Score WHERE id = :id")
+    Score getScore(int id);
+
 
 
 }

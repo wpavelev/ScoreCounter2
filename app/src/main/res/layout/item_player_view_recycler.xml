@@ -43,6 +43,7 @@
             android:layout_height="45dp"
             android:layout_marginTop="8dp"
             android:gravity="center"
+            app:autoSizeTextType="uniform"
             android:text="@{String.valueOf(player.score)}"
             app:visibleIf="@{showMainScore}"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Headline4"

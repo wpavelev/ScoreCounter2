@@ -2,14 +2,11 @@ package de.wpavelev.scorecounter2.model.repos;
 
 import android.app.Application;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.model.data.Score;
 import de.wpavelev.scorecounter2.model.database.MyDatabase;
 
@@ -22,12 +19,13 @@ public class ScoreRepository {
 
     private LiveData<List<Score>> allScores;
     private LiveData<List<Integer>> scoreSums;
+    Score mScore;
 
 
     public ScoreRepository(Application application) {
 
         MyDatabase database = MyDatabase.getInstance(application);
-        scoreDao = database.scoreDao();
+        scoreDao = database.mScoreDao();
         allScores = scoreDao.getAllScores();
 
 
@@ -51,12 +49,9 @@ public class ScoreRepository {
         return allScores;
     }
 
-    public LiveData<List<Integer>> getScoreSum(int[] player) {
-        return scoreDao.getScoreFrom(player);
 
-    }
 
-    private static class InsertScoreAsynchTask extends AsyncTask<Score, Void, Void> {
+    private static class InsertScoreAsynchTask extends AsyncTask<Score, Void, Score> {
 
         private ScoreDao scoreDao;
 
@@ -66,12 +61,11 @@ public class ScoreRepository {
 
 
         @Override
-        protected Void doInBackground(Score... scores) {
+        protected Score doInBackground(Score... scores) {
             scoreDao.insert(scores[0]);
             return null;
         }
     }
-
     private static class UpdateScoreAsynchTask extends AsyncTask<Score, Void, Void> {
 
         private ScoreDao scoreDao;
@@ -87,7 +81,6 @@ public class ScoreRepository {
             return null;
         }
     }
-
     private static class DeleteScoreAsynchTask extends AsyncTask<Score, Void, Void> {
 
         private ScoreDao scoreDao;
@@ -103,7 +96,6 @@ public class ScoreRepository {
             return null;
         }
     }
-
     private static class DeleteAllScoresAsynchTask extends AsyncTask<Score, Void, Void> {
 
         private ScoreDao scoreDao;
