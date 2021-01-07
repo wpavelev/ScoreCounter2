@@ -2,14 +2,14 @@ package de.wpavelev.scorecounter2.util;
 
 public class DisplayUtil {
 
-    static int DisplayWidthPx;
+    static int sDisplayWidthPx;
 
     public static int getDisplayWidthPx() {
-        return DisplayWidthPx;
+        return sDisplayWidthPx;
     }
 
     public static void setDisplayWidthPx(int displayWidthPx) {
-        DisplayWidthPx = displayWidthPx;
+        sDisplayWidthPx = displayWidthPx;
     }
 
 

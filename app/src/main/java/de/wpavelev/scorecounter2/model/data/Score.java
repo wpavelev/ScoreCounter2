@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 @Entity
 public class Score {
     @PrimaryKey(autoGenerate = true)
-    int id;
+    int scoreId;
 
     int player;
 
@@ -20,12 +20,12 @@ public class Score {
     }
 
 
-    public int getId() {
-        return id;
+    public int getScoreId() {
+        return scoreId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setScoreId(int scoreId) {
+        this.scoreId = scoreId;
     }
 
     public int getScore() {

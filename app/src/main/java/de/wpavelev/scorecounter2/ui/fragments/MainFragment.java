@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,18 +17,14 @@ import com.example.scorecounter2.R;
 import com.example.scorecounter2.databinding.FragmentMainBinding;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Objects;
+
 import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class MainFragment extends Fragment {
 
-    private static final String TAG = "SC2: MainFragment";
 
-
-    private FragmentMainBinding binding;
-    private MainViewModel viewModel;
-
-
-    private TextView tv;
+    private MainViewModel mMainViewModel;
 
 
     public static MainFragment newInstance() {
@@ -46,11 +41,12 @@ public class MainFragment extends Fragment {
         //TODO https://developer.android.com/training/constraint-layout
 
 
-        this.binding = FragmentMainBinding.inflate(inflater, container, false);
+        com.example.scorecounter2.databinding.FragmentMainBinding binding = FragmentMainBinding.inflate(inflater, container, false);
 
         View view = binding.getRoot();
 
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        mMainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        binding.setViewmodel(mMainViewModel);
 
         int containerNumPad = binding.mainFragmentFrameNumPad.getId();
         NumPadFragment numPadFragment = NumPadFragment.newInstance();
@@ -71,16 +67,22 @@ public class MainFragment extends Fragment {
         transaction.commit();
 
         FloatingActionButton showScoresButton = view.findViewById(R.id.floatingActionButton);
-        showScoresButton.setOnClickListener(view1 -> {
-            boolean showScore = viewModel.getShowScore().getValue();
 
-            if (!showScore) {
-                showScoresButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.arrow_up));
+        mMainViewModel.getShowScoreListLive().observe(getViewLifecycleOwner(), aBoolean -> {
+            if (aBoolean) {
+                showScoresButton.setImageDrawable(ContextCompat.getDrawable(Objects.requireNonNull(getContext()), R.drawable.arrow_up));
             } else {
-                showScoresButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.arrow_down));
+                showScoresButton.setImageDrawable(ContextCompat.getDrawable(Objects.requireNonNull(getContext()), R.drawable.arrow_down));
             }
+        });
 
-            viewModel.setShowScore(!showScore);
+        showScoresButton.setOnClickListener(view1 -> {
+            if (mMainViewModel != null) {
+                if (mMainViewModel.getShowScoreListLive().getValue() != null) {
+                    boolean showScore = mMainViewModel.getShowScoreListLive().getValue();
+                    mMainViewModel.setShowScoreListLive(!showScore);
+                }
+            }
         });
 
 

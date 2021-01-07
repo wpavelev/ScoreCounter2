@@ -19,7 +19,7 @@ import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.model.repos.ScoreDao;
 
 
-@Database(entities = {Player.class, Name.class, Score.class, PlayerAction.class}, version = 9, exportSchema = false)
+@Database(entities = {Player.class, Name.class, Score.class, PlayerAction.class}, version = 17, exportSchema = false)
 public abstract class MyDatabase extends RoomDatabase {
 
     private static MyDatabase mInstance;
@@ -40,6 +40,7 @@ public abstract class MyDatabase extends RoomDatabase {
                     MyDatabase.class, "round_database")
                     .fallbackToDestructiveMigration()
                     .addCallback(roomCallback)
+                    .allowMainThreadQueries()
                     .build();
         }
 

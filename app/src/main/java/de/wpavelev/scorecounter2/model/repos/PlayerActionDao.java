@@ -9,8 +9,6 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import de.wpavelev.scorecounter2.model.data.Name;
-import de.wpavelev.scorecounter2.model.data.Player;
 import de.wpavelev.scorecounter2.model.data.PlayerAction;
 
 @Dao
@@ -28,7 +26,11 @@ public interface PlayerActionDao {
     void deleteAll();
 
     @Query("SELECT * FROM PlayerAction ORDER BY id")
-    LiveData<List<PlayerAction>> getAllPlayerActions();
+    LiveData<List<PlayerAction>> getPlayerActions();
+
+    @Query("SELECT * FROM PlayerAction ORDER BY id")
+    List<PlayerAction> getPlayerActionList();
+
 
     @Query(("SELECT * FROM PlayerAction ORDER BY id DESC LIMIT 1"))
     PlayerAction getLastAction();

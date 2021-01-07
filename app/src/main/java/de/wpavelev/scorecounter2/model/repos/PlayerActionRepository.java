@@ -6,17 +6,11 @@ import android.os.AsyncTask;
 import androidx.lifecycle.LiveData;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.atomic.AtomicReferenceArray;
-
 
 import de.wpavelev.scorecounter2.model.data.PlayerAction;
 import de.wpavelev.scorecounter2.model.database.MyDatabase;
 
 public class PlayerActionRepository {
-    private static final String TAG = "PlayerActionRepository";
 
     private PlayerActionDao mPlayerActionDao;
     
@@ -27,7 +21,7 @@ public class PlayerActionRepository {
 
         MyDatabase database = MyDatabase.getInstance(application);
         mPlayerActionDao = database.mPlayerActionDao();
-        mAllPlayerActions = mPlayerActionDao.getAllPlayerActions();
+        mAllPlayerActions = mPlayerActionDao.getPlayerActions();
 
     }
 
@@ -36,6 +30,9 @@ public class PlayerActionRepository {
         return mAllPlayerActions;
     }
 
+    public PlayerAction getLastPlayerAction() {
+        return mPlayerActionDao.getLastAction();
+    }
 
     public void insert(PlayerAction playerAction) {
         new PlayerActionRepository.InsertPlayerActionAsynchTask(mPlayerActionDao).execute(playerAction);
@@ -52,9 +49,11 @@ public class PlayerActionRepository {
 
 
 
+
+
     private static class InsertPlayerActionAsynchTask extends AsyncTask<PlayerAction, Void, Void> {
 
-        private PlayerActionDao playerActionDao;
+        private final PlayerActionDao playerActionDao;
 
         private InsertPlayerActionAsynchTask(PlayerActionDao playerActionDao) {
             this.playerActionDao = playerActionDao;
@@ -69,7 +68,7 @@ public class PlayerActionRepository {
     }
     private static class UpdatePlayerActionAsynchTask extends AsyncTask<PlayerAction, Void, Void> {
 
-        private PlayerActionDao playerActionDao;
+        private final PlayerActionDao playerActionDao;
 
         private UpdatePlayerActionAsynchTask(PlayerActionDao playerActionDao) {
             this.playerActionDao = playerActionDao;
@@ -84,7 +83,7 @@ public class PlayerActionRepository {
     }
     private static class DeletePlayerActionAsynchTask extends AsyncTask<PlayerAction, Void, Void> {
 
-        private PlayerActionDao playerActionDao;
+        private final PlayerActionDao playerActionDao;
 
         private DeletePlayerActionAsynchTask(PlayerActionDao playerActionDao) {
             this.playerActionDao = playerActionDao;
@@ -99,7 +98,7 @@ public class PlayerActionRepository {
     }
     private static class DeleteAllPlayerActionsAsynchTask extends AsyncTask<PlayerAction, Void, Void> {
 
-        private PlayerActionDao playerActionDao;
+        private final PlayerActionDao playerActionDao;
 
         private DeleteAllPlayerActionsAsynchTask(PlayerActionDao playerActionDao) {
             this.playerActionDao = playerActionDao;

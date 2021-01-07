@@ -13,47 +13,45 @@ import de.wpavelev.scorecounter2.model.database.MyDatabase;
 
 public class ScoreRepository {
 
-    private static final String TAG = "ScoreRepository";
+    private final ScoreDao mScoreDao;
 
-    private ScoreDao scoreDao;
-
-    private LiveData<List<Score>> allScores;
-    private LiveData<List<Integer>> scoreSums;
-    Score mScore;
-
+    private final LiveData<List<Score>> mScoreList;
 
     public ScoreRepository(Application application) {
 
         MyDatabase database = MyDatabase.getInstance(application);
-        scoreDao = database.mScoreDao();
-        allScores = scoreDao.getAllScores();
+        mScoreDao = database.mScoreDao();
+        mScoreList = mScoreDao.getScores();
 
 
     }
 
 
     public void insert(Score score) {
-        new InsertScoreAsynchTask(scoreDao).execute(score);
+        new InsertScoreAsynchTask(mScoreDao).execute(score);
     }
     public void update(Score score) {
-        new UpdateScoreAsynchTask(scoreDao).execute(score);
+        new UpdateScoreAsynchTask(mScoreDao).execute(score);
     }
     public void delete(Score score) {
-        new DeleteScoreAsynchTask(scoreDao).execute(score);
+        new DeleteScoreAsynchTask(mScoreDao).execute(score);
     }
     public void deleteAll() {
-        new DeleteAllScoresAsynchTask(scoreDao).execute();
+        new DeleteAllScoresAsynchTask(mScoreDao).execute();
     }
 
-    public LiveData<List<Score>> getAllScores() {
-        return allScores;
+    public LiveData<List<Score>> getScores() {
+        return mScoreList;
     }
 
 
+    public List<Score> getScoreList() {
+        return mScoreDao.getScoreList();
+    }
 
     private static class InsertScoreAsynchTask extends AsyncTask<Score, Void, Score> {
 
-        private ScoreDao scoreDao;
+        private final ScoreDao scoreDao;
 
         private InsertScoreAsynchTask(ScoreDao scoreDao) {
             this.scoreDao = scoreDao;
@@ -68,7 +66,7 @@ public class ScoreRepository {
     }
     private static class UpdateScoreAsynchTask extends AsyncTask<Score, Void, Void> {
 
-        private ScoreDao scoreDao;
+        private final ScoreDao scoreDao;
 
         private UpdateScoreAsynchTask(ScoreDao scoreDao) {
             this.scoreDao = scoreDao;
@@ -83,7 +81,7 @@ public class ScoreRepository {
     }
     private static class DeleteScoreAsynchTask extends AsyncTask<Score, Void, Void> {
 
-        private ScoreDao scoreDao;
+        private final ScoreDao scoreDao;
 
         private DeleteScoreAsynchTask(ScoreDao scoreDao) {
             this.scoreDao = scoreDao;
@@ -98,7 +96,7 @@ public class ScoreRepository {
     }
     private static class DeleteAllScoresAsynchTask extends AsyncTask<Score, Void, Void> {
 
-        private ScoreDao scoreDao;
+        private final ScoreDao scoreDao;
 
         private DeleteAllScoresAsynchTask(ScoreDao scoreDao) {
             this.scoreDao = scoreDao;

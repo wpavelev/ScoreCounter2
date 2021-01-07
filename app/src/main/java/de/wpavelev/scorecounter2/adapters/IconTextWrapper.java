@@ -3,34 +3,34 @@ package de.wpavelev.scorecounter2.adapters;
 import androidx.annotation.NonNull;
 
 public class IconTextWrapper {
-    private String text;
-    private int drawable;
+    private String mText;
+    private int mDrawable;
 
     public IconTextWrapper(String text, int drawableId) {
-        this.text = text;
-        this.drawable = drawableId;
+        this.mText = text;
+        this.mDrawable = drawableId;
     }
 
     public String getText() {
-        return text;
+        return mText;
     }
 
     public void setText(String text) {
-        this.text = text;
+        this.mText = text;
     }
 
     public int getDrawable() {
-        return drawable;
+        return mDrawable;
     }
 
     public void setDrawable(int drawable) {
-        this.drawable = drawable;
+        this.mDrawable = drawable;
     }
 
     @NonNull
     @Override
     public String toString() {
-        return text + "_"+ drawable;
+        return mText + "_"+ mDrawable;
 
 
 

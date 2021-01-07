@@ -7,6 +7,7 @@ import androidx.lifecycle.LiveData;
 
 import java.util.List;
 
+import de.wpavelev.scorecounter2.model.data.PlayerWithScore;
 import de.wpavelev.scorecounter2.model.database.MyDatabase;
 import de.wpavelev.scorecounter2.model.data.Player;
 
@@ -14,39 +15,55 @@ import de.wpavelev.scorecounter2.model.data.Player;
 public class PlayerRepository {
 
 
-    private PlayerDao playerDao;
+    private final PlayerDao mPlayerDao;
 
-    private LiveData<List<Player>> allPlayers;
-
+    private final LiveData<List<Player>> mPlayerList;
+    private final LiveData<List<PlayerWithScore>> mPlayerWithScore;
 
     public PlayerRepository(Application application) {
         MyDatabase database = MyDatabase.getInstance(application);
-        playerDao = database.mPlayerDao();
-        allPlayers = playerDao.getAllPlayer();
+        mPlayerDao = database.mPlayerDao();
+        mPlayerList = mPlayerDao.getPlayers();
+        mPlayerWithScore = mPlayerDao.getPlayerWithScore();
 
     }
 
 
     public void insert(Player player) {
-        new InsertPlayerAsynchTask(playerDao).execute(player);
+        new InsertPlayerAsynchTask(mPlayerDao).execute(player);
     }
+
     public void update(Player player) {
-        new UpdatePlayerAsynchTask(playerDao).execute(player);
+        new UpdatePlayerAsynchTask(mPlayerDao).execute(player);
     }
+
     public void delete(Player player) {
-        new DeletePlayerAsynchTask(playerDao).execute(player);
+        new DeletePlayerAsynchTask(mPlayerDao).execute(player);
     }
+
     public void deleteAll() {
-        new DeleteAllPlayersAsynchTask(playerDao).execute();
+        new DeleteAllPlayersAsynchTask(mPlayerDao).execute();
     }
 
-    public LiveData<List<Player>> getAllPlayers() {
-        return allPlayers;
+    public LiveData<List<Player>> getPlayers() {
+        return mPlayerList;
+    }
+    public List<Player> getPlayerList() {
+        return mPlayerDao.getPlayerList();
     }
 
+    public LiveData<List<PlayerWithScore>> getPlayerWithScore() {
+        return mPlayerWithScore;
+    }
+    public Player getPlayerById (int playerId) {
+        return mPlayerDao.getPlayerById(playerId);
+    }
+    public List<Player> getPlayerOnce() {
+        return mPlayerDao.getPlayerList();
+    }
     private static class InsertPlayerAsynchTask extends AsyncTask<Player, Void, Void> {
 
-        private PlayerDao playerDao;
+        private final PlayerDao playerDao;
 
         private InsertPlayerAsynchTask(PlayerDao playerDao) {
             this.playerDao = playerDao;
@@ -59,9 +76,10 @@ public class PlayerRepository {
             return null;
         }
     }
+
     private static class UpdatePlayerAsynchTask extends AsyncTask<Player, Void, Void> {
 
-        private PlayerDao playerDao;
+        private final PlayerDao playerDao;
 
         private UpdatePlayerAsynchTask(PlayerDao playerDao) {
             this.playerDao = playerDao;
@@ -74,9 +92,10 @@ public class PlayerRepository {
             return null;
         }
     }
+
     private static class DeletePlayerAsynchTask extends AsyncTask<Player, Void, Void> {
 
-        private PlayerDao playerDao;
+        private final PlayerDao playerDao;
 
         private DeletePlayerAsynchTask(PlayerDao playerDao) {
             this.playerDao = playerDao;
@@ -89,9 +108,10 @@ public class PlayerRepository {
             return null;
         }
     }
+
     private static class DeleteAllPlayersAsynchTask extends AsyncTask<Player, Void, Void> {
 
-        private PlayerDao playerDao;
+        private final PlayerDao playerDao;
 
         private DeleteAllPlayersAsynchTask(PlayerDao playerDao) {
             this.playerDao = playerDao;

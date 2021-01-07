@@ -28,6 +28,6 @@ public interface NameDao {
     void deleteAll();
 
     @Query("SELECT * FROM Name ORDER BY name")
-    LiveData<List<Name>> getAllNames();
+    LiveData<List<Name>> getNames();
 
 }

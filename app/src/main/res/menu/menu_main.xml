@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/menu_chart"
+        android:icon="@drawable/stats"
+        android:title="Chart"
+        app:showAsAction="always"
+        />
+    <item
+        android:id="@+id/menu_player_count"
+        android:icon="@drawable/player"
+        android:title="playerCount"
+        app:showAsAction="always" />
     <item
         android:id="@+id/menu_show_scores"
         android:icon="@drawable/auge_offen"
         android:title="Show Scores"
         app:showAsAction="always" />
     <item
-        android:id="@+id/menu_open_menu"
-        android:icon="@drawable/ic_more_vert_black_24dp"
-        android:title="&#8942;"
+        android:id="@+id/menu_newgame"
+        android:icon="@drawable/new_game_icon"
+        android:title="New Game"
         app:showAsAction="always" />
 </menu>

@@ -1,9 +1,12 @@
 package de.wpavelev.scorecounter2.adapters;
 
 import android.content.Context;
+import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,34 +21,39 @@ import de.wpavelev.scorecounter2.model.data.Name;
 
 public class NameListDialogAdapter extends RecyclerView.Adapter<NameListDialogAdapter.MyViewHolder> {
 
-    private String TAG = "SimpleNameListAdapter";
-    private List<Name> dataset;
-    private LayoutInflater layoutInflater;
+    private static final String TAG = "NameListDialogAdapter";
+    private List<Name> mNameList;
+    private final LayoutInflater mLayoutInflater;
 
-    private ClickListener clickListener;
-
+    private final ClickListener mClickListener;
     public interface ClickListener{
 
         void onItemClick(View v, Name name);
+
+        void onItemEdit(View v, Name name);
+
+        void onItemDelete(View v, Name name);
     }
+
+
 
     public NameListDialogAdapter(Context context, List<Name> nameList, ClickListener clickListener) {
 
-        this.clickListener = clickListener;
-        this.layoutInflater = LayoutInflater.from(context);
-        this.dataset = nameList == null ? new ArrayList<Name>() : nameList;
+        this.mClickListener = clickListener;
+        this.mLayoutInflater = LayoutInflater.from(context);
+        this.mNameList = nameList == null ? new ArrayList<>() : nameList;
 
     }
 
-    public void setDataset(List<Name> dataset) {
-        this.dataset = dataset;
+    public void setNameList(List<Name> nameList) {
+        this.mNameList = nameList;
     }
 
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = layoutInflater.inflate(R.layout.item_namelist, parent, false);
+        View view = mLayoutInflater.inflate(R.layout.item_namelist, parent, false);
 
         return new MyViewHolder(view);
 
@@ -55,14 +63,14 @@ public class NameListDialogAdapter extends RecyclerView.Adapter<NameListDialogAd
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
-        holder.textViewItem.setText(dataset.get(position).getName());
+        holder.textViewItem.setText(mNameList.get(position).getName());
 
     }
 
 
     @Override
     public int getItemCount() {
-        return dataset.size();
+        return mNameList.size();
     }
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -73,20 +81,42 @@ public class NameListDialogAdapter extends RecyclerView.Adapter<NameListDialogAd
             super(itemView);
 
             textViewItem = itemView.findViewById(R.id.tv_name_item);
-
-            if (clickListener != null) {
-                itemView.setOnClickListener(this);
+            ImageButton editName = itemView.findViewById(R.id.imageButton_EditName);
+            ImageButton deleteName = itemView.findViewById(R.id.imageButton_DeleteName);
+            if (mClickListener != null) {
+                textViewItem.setOnClickListener(this);
+                editName.setOnClickListener(this);
+                deleteName.setOnClickListener(this);
             }
 
         }
 
         @Override
         public void onClick(View v) {
-            if (clickListener != null) {
-                clickListener.onItemClick(v, dataset.get(getAdapterPosition()));
-
+            if (mClickListener == null) {
+                Log.d(TAG, "onClick: ");
+                return;
             }
+
+            switch (v.getId()) {
+                case R.id.tv_name_item:
+                    Log.d(TAG, "onClick: TV");
+                    mClickListener.onItemClick(v, mNameList.get(getAdapterPosition()));
+                    break;
+                case R.id.imageButton_EditName:
+                    Log.d(TAG, "onClick: Edit");
+                    mClickListener.onItemEdit(v, mNameList.get(getAdapterPosition()));
+                    break;
+
+                case R.id.imageButton_DeleteName:
+                    Log.d(TAG, "onClick: Delete");
+                    mClickListener.onItemDelete(v, mNameList.get(getAdapterPosition()));
+                    break;
+            }
+
         }
+
+
 
     }
 

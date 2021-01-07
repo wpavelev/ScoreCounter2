@@ -4,58 +4,63 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 public class Player {
 
     @PrimaryKey(autoGenerate = true)
-    int id;
+    int playerId;
 
     private String name;
 
+    @Ignore
     private int score;
 
-    private int lastScore;
+    private int activePlayer;
 
+    private int qwirkle;
 
     public Player(String name) {
         this.name = name;
     }
 
 
-    public int getId() {
-        return id;
+    public int getPlayerId() {
+        return playerId;
     }
 
     public String getName() {
         return name;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public int getLastScore() {
-        return lastScore;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
     }
 
     public void setName(String name) {
         this.name = name;
     }
 
+    public int getScore() {
+        return score;
+    }
+
     public void setScore(int score) {
         this.score = score;
     }
 
-    public void setLastScore(int lastScore) {
-        this.lastScore = lastScore;
+    public int getQwirkle() {
+        return qwirkle;
     }
 
+    public void setQwirkle(int qwirkle) {
+        this.qwirkle = qwirkle;
+    }
 
+    public int getActivePlayer() {
+        return activePlayer;
+    }
+
+    public void setActivePlayer(int activePlayer) {
+        this.activePlayer = activePlayer;
+    }
 }

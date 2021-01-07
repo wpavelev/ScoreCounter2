@@ -13,15 +13,15 @@ import de.wpavelev.scorecounter2.model.data.Name;
 
 public class NameRepository {
 
-    private NameDao nameDao;
+    private final NameDao nameDao;
 
-    private LiveData<List<Name>> allNames;
+    private final LiveData<List<Name>> mNamesList;
 
 
     public NameRepository(Application application) {
         MyDatabase database = MyDatabase.getInstance(application);
         nameDao = database.mNameDao();
-        allNames = nameDao.getAllNames();
+        mNamesList = nameDao.getNames();
     }
 
     public void insert(Name name) {
@@ -41,14 +41,14 @@ public class NameRepository {
     }
 
 
-    public LiveData<List<Name>> getAllNames() {
-        return allNames;
+    public LiveData<List<Name>> getNamesList() {
+        return mNamesList;
     }
 
 
     private static class InsertNameAsynchTask extends AsyncTask<Name, Void, Void> {
 
-        private NameDao nameDao;
+        private final NameDao nameDao;
 
         private InsertNameAsynchTask(NameDao nameDao) {
             this.nameDao = nameDao;
@@ -64,7 +64,7 @@ public class NameRepository {
 
     private static class UpdateNameAsynchTask extends AsyncTask<Name, Void, Void> {
 
-        private NameDao nameDao;
+        private final NameDao nameDao;
 
         private UpdateNameAsynchTask(NameDao nameDao) {
             this.nameDao = nameDao;
@@ -80,7 +80,7 @@ public class NameRepository {
 
     private static class DeleteNameAsynchTask extends AsyncTask<Name, Void, Void> {
 
-        private NameDao nameDao;
+        private final NameDao nameDao;
 
         private DeleteNameAsynchTask(NameDao nameDao) {
             this.nameDao = nameDao;
@@ -96,7 +96,7 @@ public class NameRepository {
 
     private static class DeleteAllNamesAsynchTask extends AsyncTask<Name, Void, Void> {
 
-        private NameDao nameDao;
+        private final NameDao nameDao;
 
         private DeleteAllNamesAsynchTask(NameDao nameDao) {
             this.nameDao = nameDao;

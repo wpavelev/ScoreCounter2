@@ -19,9 +19,6 @@ import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
  */
 public class NumPadFragment extends Fragment {
 
-    private MainViewModel viewModel;
-    private FragmentNumPadBinding binding;
-
     public NumPadFragment() {
         // Required empty public constructor
     }
@@ -37,15 +34,13 @@ public class NumPadFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        this.binding = FragmentNumPadBinding.inflate(inflater,container,false);
+        com.example.scorecounter2.databinding.FragmentNumPadBinding binding = FragmentNumPadBinding.inflate(inflater, container, false);
 
-        this.viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        this.binding.setViewmodel(this.viewModel);
-        this.binding.setLifecycleOwner(getViewLifecycleOwner());
+        MainViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        binding.setViewmodel(viewModel);
+        binding.setLifecycleOwner(getViewLifecycleOwner());
 
-        View view = binding.getRoot();
-
-        return view;
+        return binding.getRoot();
     }
 
     @Override

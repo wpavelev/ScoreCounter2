@@ -1,10 +1,11 @@
 package de.wpavelev.scorecounter2.dialogs;
 
+import android.app.Dialog;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scorecounter2.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -24,22 +26,25 @@ import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class NameListDialog extends DialogFragment {
 
-    private static final String TAG = "SC2: LongClickPlayerDia";
 
-    private NameListDialogAdapter adapter;
+    private NameListDialogAdapter mNameListDialogAdapter;
 
-    public interface onClickListener {
+    public interface OnClickListener {
         void newName();
 
         void clickPlayer(Name name);
+
+        void editName(Name name);
+
+        void deleteName(Name name);
     }
 
-    onClickListener listener;
+    OnClickListener mListener;
 
-    MainViewModel viewModel;
+    MainViewModel mMainViewModel;
 
-    public NameListDialog(onClickListener listener) {
-        this.listener = listener;
+    public NameListDialog(OnClickListener listener) {
+        this.mListener = listener;
 
     }
 
@@ -47,19 +52,16 @@ public class NameListDialog extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-
         View view = inflater.inflate(R.layout.dialog_namelist, container, false);
 
-        getDialog().setCancelable(true);
 
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        mMainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-
-        Button addName = view.findViewById(R.id.btn_addName);
+        FloatingActionButton addName = view.findViewById(R.id.floatingActionButton2);
         addName.setOnClickListener(v -> {
-            listener.newName();
+            mListener.newName();
             getDialog().dismiss();
-            Log.d(TAG, "onCreateView: newname");
+
         });
 
         RecyclerView recyclerView = view.findViewById(R.id.recyler_namelist);
@@ -68,34 +70,58 @@ public class NameListDialog extends DialogFragment {
 
         recyclerView.hasFixedSize();
 
-        adapter = new NameListDialogAdapter(getContext(), new ArrayList<>(), (v, name) -> {
-            listener.clickPlayer(name);
-            getDialog().dismiss();
-            Log.d(TAG, "onCreateView: Name selected: " + name.getName());
+        mNameListDialogAdapter = new NameListDialogAdapter(getContext(), new ArrayList<>(), new NameListDialogAdapter.ClickListener() {
+            @Override
+            public void onItemClick(View v, Name name) {
+                mListener.clickPlayer(name);
+                getDialog().dismiss();
+            }
 
+            @Override
+            public void onItemEdit(View v, Name name) {
+                mListener.editName(name);
+
+            }
+
+            @Override
+            public void onItemDelete(View v, Name name) {
+                mListener.deleteName(name);
+            }
         });
 
-        recyclerView.setAdapter(adapter);
 
+
+        recyclerView.setAdapter(mNameListDialogAdapter);
 
 
         return view;
 
     }
 
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setCancelable(true);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        return dialog;
+    }
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
 
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        mMainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
-        viewModel.getNames().observe(getViewLifecycleOwner(), names -> {
-            adapter.setDataset(names);
-            adapter.notifyDataSetChanged();
+        mMainViewModel.getNames().observe(getViewLifecycleOwner(), names -> {
+            mNameListDialogAdapter.setNameList(names);
+            mNameListDialogAdapter.notifyDataSetChanged();
         });
 
 
         super.onActivityCreated(savedInstanceState);
     }
+
 
 
 }

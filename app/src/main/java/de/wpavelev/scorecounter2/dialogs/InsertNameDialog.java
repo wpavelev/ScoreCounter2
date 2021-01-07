@@ -17,71 +17,62 @@ import androidx.fragment.app.DialogFragment;
 
 import com.example.scorecounter2.R;
 
+import java.util.Objects;
+
 import de.wpavelev.scorecounter2.model.data.Name;
 import de.wpavelev.scorecounter2.model.data.Player;
-import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class InsertNameDialog extends DialogFragment {
 
-    private static final String TAG = "SC2: InsertNameDialog";
 
-    private MainViewModel viewModel;
-    private Name name;
-    private Player player;
+    private Name mName;
+    private Player mPlayer;
 
-    private  int mode = 0;
+    private int mMode = 0;
 
     private static final int MODE_PLAYER = 1;
     private static final int MODE_NAME = 2;
 
 
-    public interface ChangeName {
+    public interface ChangeNameListener {
         void onClickOk(Name name);
 
     }
-    public interface ChangePlayer {
+
+    public interface ChangePlayerListener {
         void onClickOk(Player player);
 
     }
 
-    ChangeName nameListener;
-    ChangePlayer playerListener;
-    InputMethodManager inputMethodManager;
+    ChangeNameListener mChangeNameListenerListener;
+    ChangePlayerListener mChangePlayerListenerListener;
+    InputMethodManager mInputMethodManager;
 
 
-    public InsertNameDialog(Name name, ChangeName nameListener) {
+    public InsertNameDialog(Name name, ChangeNameListener mChangeNameListener) {
 
-        this.name = name;
-        this.nameListener = nameListener;
-        this.mode = MODE_NAME;
+        this.mName = name;
+        this.mChangeNameListenerListener = mChangeNameListener;
+        this.mMode = MODE_NAME;
     }
 
-    public InsertNameDialog(Player player, ChangePlayer playerListener) {
-
-        this.player = player;
-        this.playerListener = playerListener;
-        this.mode = MODE_PLAYER;
-
-    }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
 
-
         View view = inflater.inflate(R.layout.dialog_edit_name, container, false);
 
-        getDialog().setCancelable(true);
+        Objects.requireNonNull(getDialog()).setCancelable(true);
 
         EditText et = view.findViewById(R.id.dialog_edit_name_tv_name);
 
 
-
         et.setInputType(InputType.TYPE_CLASS_TEXT);
         et.requestFocus();
-        inputMethodManager = (InputMethodManager) getActivity().getSystemService(Service.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
+        mInputMethodManager = (InputMethodManager) Objects.requireNonNull(getActivity()).getSystemService(Service.INPUT_METHOD_SERVICE);
+        mInputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
 
         ImageButton buttonOkay = view.findViewById(R.id.dialog_edit_name_button_commit);
@@ -89,14 +80,14 @@ public class InsertNameDialog extends DialogFragment {
         buttonOkay.setOnClickListener(v -> {
             String input = et.getText().toString();
 
-            switch (mode) {
+            switch (mMode) {
                 case MODE_NAME:
-                    name.setName(input);
-                    nameListener.onClickOk(name);
+                    mName.setName(input);
+                    mChangeNameListenerListener.onClickOk(mName);
                     break;
                 case MODE_PLAYER:
-                    player.setName(input);
-                    playerListener.onClickOk(player);
+                    mPlayer.setName(input);
+                    mChangePlayerListenerListener.onClickOk(mPlayer);
                     break;
             }
 
@@ -108,19 +99,17 @@ public class InsertNameDialog extends DialogFragment {
     }
 
 
-
-
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
 
-        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        mInputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
 
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
 
-        inputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+        mInputMethodManager.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
     }
 }

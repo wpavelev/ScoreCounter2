@@ -16,7 +16,7 @@ import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class ScoreViewFragment extends Fragment {
 
-    FragmentScoreViewBinding binding;
+    FragmentScoreViewBinding mBinding;
 
 
     public ScoreViewFragment() {
@@ -30,12 +30,12 @@ public class ScoreViewFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentScoreViewBinding.inflate(inflater, container, false);
-        View view = binding.getRoot();
+        mBinding = FragmentScoreViewBinding.inflate(inflater, container, false);
+        View view = mBinding.getRoot();
 
         MainViewModel viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-        binding.setViewmodel(viewModel);
-        binding.setLifecycleOwner(getViewLifecycleOwner());
+        mBinding.setViewmodel(viewModel);
+        mBinding.setLifecycleOwner(getViewLifecycleOwner());
 
         return view;
     }

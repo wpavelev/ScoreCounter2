@@ -1,11 +1,7 @@
 package de.wpavelev.scorecounter2.adapters;
 
 import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
-import android.util.SparseArray;
-import android.util.SparseIntArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,107 +9,65 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.LiveData;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.scorecounter2.R;
 import com.example.scorecounter2.databinding.ItemPlayerViewRecyclerBinding;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import de.wpavelev.scorecounter2.model.data.Player;
+import de.wpavelev.scorecounter2.model.data.PlayerWithScore;
 import de.wpavelev.scorecounter2.model.data.Score;
+import de.wpavelev.scorecounter2.util.ColorUtil;
 import de.wpavelev.scorecounter2.util.DisplayUtil;
 
-public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.MyViewHolder> {
+import static com.example.scorecounter2.R.string.score_click_info;
+
+public class PlayerViewAdapter extends ListAdapter<PlayerWithScore, PlayerViewAdapter.MyViewHolder> {
 
     public interface ClickListener {
 
         void onItemClick(View v, int position);
     }
+
     public interface LongClickListener {
 
         void onItemLongClick(View v, int position);
     }
+
     public interface ScoreChangeListener {
 
         void onScoreChange(Score score);
     }
 
-    protected boolean showMainScore = true;
+    protected boolean mShowMainScore = true;
+    protected boolean mMShowScoreList = true;
 
 
-
-    SparseIntArray mainScores = new SparseIntArray();
-
-    private String TAG = "PlayerViewAdapter";
-
-    /**
-     * Liste der Spieler, die angezeigt werden
-     */
-    //private List<Player> playerList;
-
-    /**
-     * Listen von Scores, die in Tabellenform angezeigt werden
-     */
-    private SparseArray<List<Score>> playerScores;
 
 
     /**
      * Anzahl der Spieler
      */
-    private int playerCount = 0;
+    private int mPlayerCount = 0;
 
-    /**
-     * Spieler, der an der Reihe ist
-     */
-    private int activePlayer = 0;
+    private ScoreChangeListener mScoreChangeListener;
+    private ClickListener mClickListener;
+    private LongClickListener mLongClickListener;
 
+    private int mActivePlayer;
 
-    private int editingScore = 0;
-
-    private ScoreChangeListener scoreChangeListener;
-    private ClickListener clickListener;
-    private LongClickListener longClickListener;
-
-    private LifecycleOwner lifecycleOwner;
-    private LiveData<List<Player>> playerListLiveData;
-    private LiveData<Boolean> showScoresLiveData;
-    private LiveData<Boolean> showMainScoreLiveData;
-
-    private List<Player> playerList = new ArrayList<>();
+    Context mContext;
 
 
-
-    private Context context;
-
-    public PlayerViewAdapter(Context context,
-                             LifecycleOwner lifecycleOwner,
-                             LiveData<List<Player>> playerListLiveData,
-                             LiveData<List<Score>> scoreListLiveData,
-                             LiveData<Boolean> showScoresLiveData,
-                             LiveData<Boolean> showMainScoreLiveData) {
-
-        this.context = context;
-
-        this.lifecycleOwner = lifecycleOwner;
-
-        this.showScoresLiveData = showScoresLiveData;
-
-        this.playerListLiveData = playerListLiveData;
-
-        this.showMainScoreLiveData = showMainScoreLiveData;
-
-        playerListLiveData.observe(lifecycleOwner, players -> playerList = new ArrayList<>(players));
-
-        scoreListLiveData.observe(lifecycleOwner, this::setPlayerScores);
-
-        showMainScoreLiveData.observe(lifecycleOwner, this::setShowPlayerMainScor);
+    public PlayerViewAdapter(Context context) {
+        super(DIFF_CALLBACK);
+        this.mContext = context;
 
 
 
@@ -121,56 +75,55 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
     }
 
 
+    private static final DiffUtil.ItemCallback<PlayerWithScore> DIFF_CALLBACK = new DiffUtil.ItemCallback<PlayerWithScore>() {
 
-    private void setPlayerScores(List<Score> scoreList) {
-        this.playerScores = convertScoreListToSparseArray(scoreList);
-        notifyDataSetChanged();
-    }
+        @Override
+        public boolean areItemsTheSame(@NonNull PlayerWithScore oldItem, @NonNull PlayerWithScore newItem) {
 
-    private SparseArray<List<Score>> convertScoreListToSparseArray(List<Score> scoreList) {
-
-        mainScores = new SparseIntArray();
-        SparseArray<List<Score>> sparseArray = new SparseArray<>();
-        Set<Integer> playerIdExists = new HashSet<>();
-        for (Score score : scoreList) {
-            int playerId = score.getPlayer();
-
-            if (!playerIdExists.contains(playerId)) {
-                sparseArray.put(playerId, new ArrayList<>());
-                mainScores.put(playerId, 0);
-            }
-            playerIdExists.add(playerId);
-            sparseArray.get(playerId).add(score);
-            mainScores.put(playerId, mainScores.get(playerId) + score.getScore());
-
+            return oldItem.mPlayer.getPlayerId() == newItem.mPlayer.getPlayerId();
 
         }
 
-        return sparseArray;
-    }
+        @Override
+        public boolean areContentsTheSame(@NonNull PlayerWithScore oldItem, @NonNull PlayerWithScore newItem) {
+
+            if (!oldItem.mPlayer.getName().equals(newItem.mPlayer.getName())) {
+                return false;
+            }
+
+
+
+            if (oldItem.mPlayerScores.size() != newItem.mPlayerScores.size()) {
+                return false;
+            }
+
+
+            for (int i = 0; i < oldItem.mPlayerScores.size(); i++) {
+
+
+                if (oldItem.mPlayerScores.get(i).getScore() != newItem.mPlayerScores.get(i).getScore()) {
+                    return false;
+                }
+                if (oldItem.mPlayerScores.get(i).isSelected() != newItem.mPlayerScores.get(i).isSelected()) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    };
 
     public void setPlayerCount(int playerCount) {
-
-        this.playerCount = playerCount;
-        notifyDataSetChanged();
-
+        this.mPlayerCount = playerCount;
     }
 
-    public void setActivePlayer(int activePlayer) {
-        this.activePlayer = activePlayer;
-        notifyDataSetChanged();
-    }
 
     public void setListener(ClickListener clickListener, LongClickListener longClickListener, ScoreChangeListener scoreChangeListener) {
-        this.clickListener = clickListener;
-        this.longClickListener = longClickListener;
-        this.scoreChangeListener = scoreChangeListener;
+        this.mClickListener = clickListener;
+        this.mLongClickListener = longClickListener;
+        this.mScoreChangeListener = scoreChangeListener;
     }
 
-    public void setShowPlayerMainScor(boolean showPlayerMainScore) {
-        this.showMainScore = showPlayerMainScore;
-        notifyDataSetChanged();
-    }
 
     @NonNull
     @Override
@@ -187,99 +140,93 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
     }
 
+    public void setActivePlayer(int activePlayerOrder) {
+        mActivePlayer = activePlayerOrder;
+        notifyDataSetChanged();
+    }
+
+
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-        Player player = playerList.get(position);
-        holder.setPlayerPosition(position, activePlayer);
-        if (mainScores != null && mainScores.size() >= player.getId()) {
-            player.setScore(mainScores.get(player.getId()));
-        }
+
+        Player player = getItem(position).mPlayer;
+        holder.setPlayerBackgroundColor(position, mActivePlayer);
         holder.setPlayer(player);
 
-        holder.setShowMainScore(showMainScore);
+        holder.setShowMainScore(mShowMainScore);
 
-        if (playerScores != null) {
-            holder.setPlayerScoreList(playerScores.get(player.getId()));
-        }
-
-        if (editingScore != -1) {
-            holder.setEditScore(editingScore);
-
-        }
+        holder.setPlayerScoreList(getItem(position).mPlayerScores);
 
 
     }
 
-
-    @Override
-    public int getItemCount() {
-
-        return playerList.size();
-
+    public void setShowMainScore(boolean showMainScore) {
+        this.mShowMainScore = showMainScore;
+        notifyDataSetChanged();
     }
 
+    public void setMShowScoreList(boolean MShowScoreList) {
+
+        mMShowScoreList = MShowScoreList;
+        notifyDataSetChanged();
+    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
-        private ConstraintLayout layout;
-        private TypedArray activePlayerArrayColor;
-        private TypedArray inactivePlayerArrayColor;
+        private final ConstraintLayout layout;
 
-        private ItemPlayerViewRecyclerBinding viewHolderBinding;
 
-        PlayerScoreAdapter playerScoreAdapter;
+        private final ItemPlayerViewRecyclerBinding viewHolderBinding;
 
-        Drawable border;
+        private final ScoreListAdapter mScoreListAdapter;
 
 
         public MyViewHolder(ItemPlayerViewRecyclerBinding binding) {
+
             super(binding.getRoot());
 
             this.viewHolderBinding = binding;
 
 
-
-
             layout = binding.itemPlayerViewRecyclerView;
-            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (0.5 + playerCount));
+            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (mPlayerCount) - 40);
             layout.setMaxWidth(layoutWidth);
             layout.setMinWidth(layoutWidth);
 
 
-            activePlayerArrayColor = context.getResources().obtainTypedArray(R.array.player_color);
-            inactivePlayerArrayColor = context.getResources().obtainTypedArray(R.array.inactive_player_color);
-
-            border = context.getResources().getDrawable(R.drawable.border);
-
-
             RecyclerView recyclerPlayerScore = binding.itemPlayerViewRecyclerPlayerScore;
-            recyclerPlayerScore.setLayoutManager(new LinearLayoutManager(context, RecyclerView.VERTICAL, false));
-
-            playerScoreAdapter = new PlayerScoreAdapter(context);
-
-            playerScoreAdapter.setClickListener((v, score) -> Toast.makeText(context, "" + score.getScore(), Toast.LENGTH_SHORT).show());
-
-            playerScoreAdapter.setLongClickListener((v, score) -> scoreChangeListener.onScoreChange(score));
-
-
-            recyclerPlayerScore.setAdapter(playerScoreAdapter);
-
-            showScoresLiveData.observe(lifecycleOwner, aBoolean -> binding.setShowScores(aBoolean));
-
-
-
-            if (clickListener != null) {
-                itemView.setOnClickListener(this);
+            if (mMShowScoreList) {
+                recyclerPlayerScore.setVisibility(View.VISIBLE);
             } else {
-                Log.d(TAG, "MyViewHolder: clickListener is null");
+                recyclerPlayerScore.setVisibility(View.GONE);
+            }
+            LinearLayoutManager layoutManager = new LinearLayoutManager(mContext, RecyclerView.VERTICAL, false);
+            layoutManager.setStackFromEnd(false);
+            recyclerPlayerScore.setLayoutManager(layoutManager);
 
+            mScoreListAdapter = new ScoreListAdapter(mContext);
+
+            mScoreListAdapter.setClickListener((v, score) -> {
+
+                Toast.makeText(mContext, score_click_info, Toast.LENGTH_SHORT).show();
+                mScoreListAdapter.notifyDataSetChanged();
+            });
+            mScoreListAdapter.setLongClickListener((v, score) -> mScoreChangeListener.onScoreChange(score));
+
+
+            recyclerPlayerScore.setAdapter(mScoreListAdapter);
+
+            // TODO: 29.12.2020
+
+            binding.setShowScores(true);
+
+
+            if (mClickListener != null) {
+                itemView.setOnClickListener(this);
             }
 
-            if (longClickListener != null) {
+            if (mLongClickListener != null) {
                 itemView.setOnLongClickListener(this);
-            } else {
-                Log.d(TAG, "MyViewHolder: longClickListener is null");
-
             }
 
 
@@ -287,50 +234,46 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
 
         public void setPlayer(Player player) {
             viewHolderBinding.setPlayer(player);
-        }
-        public void setEditScore(int score) {
-            playerScoreAdapter.setEditScore(score);
+
+
 
         }
+
 
         public void setShowMainScore(boolean showMainScore) {
             viewHolderBinding.setShowMainScore(showMainScore);
         }
 
         public void setPlayerScoreList(List<Score> playerScores) {
-            if (playerScores != null) {
-                playerScoreAdapter.setDataset(playerScores);
-                playerScoreAdapter.notifyDataSetChanged();
-                Log.d(TAG, "setPlayerScoreList");
-                for (Score playerScore : playerScores) {
-                    Log.d(TAG, "score.player=" + playerScore.getPlayer() + " " +
-                            "score.score=" + playerScore.getScore());
-                }
-
+            RecyclerView recyclerPlayerScore;
+            recyclerPlayerScore = this.viewHolderBinding.itemPlayerViewRecyclerPlayerScore;
+            if (mMShowScoreList) {
+                recyclerPlayerScore.setVisibility(View.VISIBLE);
             } else {
-                playerScoreAdapter.setDataset(new ArrayList<>());
-                playerScoreAdapter.notifyDataSetChanged();
-                Log.w(TAG, "bindPlayerScore: playerScores is null!");
+                recyclerPlayerScore.setVisibility(View.GONE);
             }
+            mScoreListAdapter.submitList(playerScores);
+            recyclerPlayerScore.scrollToPosition(0);
+
+
         }
 
-        public void setPlayerPosition(int playerPosition, int activePlayer) {
-
+        public void setPlayerBackgroundColor(int playerPosition, int activePlayer) {
             int arrayPosition;
             if (playerPosition >= 0) {
-                if (playerCount < 4) {
+                if (mPlayerCount < 4) {
                     arrayPosition = playerPosition;
                 } else {
                     arrayPosition = playerPosition % 4;
 
                 }
 
-                int activePlayerColorId = activePlayerArrayColor.getResourceId(arrayPosition, 0);
-                int inactivePlayerColorId = inactivePlayerArrayColor.getResourceId(arrayPosition, 0);
+                int activePlayerColorId = ColorUtil.getActivePlayerArrayColor().getResourceId(arrayPosition, 0);
+                int inactivePlayerColorId = ColorUtil.getInactivePlayerArrayColor().getResourceId(arrayPosition, 0);
 
-                int playerBackground = context.getResources().getColor(inactivePlayerColorId);
+                int playerBackground = ContextCompat.getColor(mContext, inactivePlayerColorId);
                 if (activePlayer == playerPosition) {
-                    playerBackground = context.getResources().getColor(activePlayerColorId);
+                    playerBackground = ContextCompat.getColor(mContext, activePlayerColorId);
                 }
 
                 layout.setBackgroundColor(playerBackground);
@@ -341,24 +284,17 @@ public class PlayerViewAdapter extends RecyclerView.Adapter<PlayerViewAdapter.My
         }
 
 
-
         @Override
         public void onClick(View v) {
-            if (clickListener == null) {
-                Log.e(TAG, "onClick: clickListener is Null");
-            } else {
-                clickListener.onItemClick(v, getAdapterPosition());
-
+            if (mClickListener != null) {
+                mClickListener.onItemClick(v, getAdapterPosition());
             }
         }
 
         @Override
         public boolean onLongClick(View v) {
-            if (longClickListener == null) {
-                Log.e(TAG, "onLongClick: longClickListener is Null");
-            } else {
-                longClickListener.onItemLongClick(v, getAdapterPosition());
-
+            if (mLongClickListener != null) {
+                mLongClickListener.onItemLongClick(v, getAdapterPosition());
             }
 
             return false;

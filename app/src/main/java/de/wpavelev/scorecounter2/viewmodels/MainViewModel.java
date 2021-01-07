@@ -9,10 +9,10 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.wpavelev.scorecounter2.model.data.PlayerAction;
+import de.wpavelev.scorecounter2.model.data.PlayerWithScore;
 import de.wpavelev.scorecounter2.model.repos.NameRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerActionRepository;
 import de.wpavelev.scorecounter2.model.repos.PlayerRepository;
@@ -24,69 +24,74 @@ import de.wpavelev.scorecounter2.util.SingleLiveEvent;
 
 public class MainViewModel extends AndroidViewModel {
 
-    private static final String TAG = "MainViewModel";
-
     public static final int INPUTMODE_DEFAULT = 0;
     public static final int INPUTMODE_EDIT_SCORE = 1;
 
 
-    private NameRepository mNameRepository;
-    private PlayerRepository mPlayerRepository;
-    private ScoreRepository mScoreRepository;
-    private PlayerActionRepository mPlayerActionRepository;
+    private final NameRepository mNameRepository;
+    private final PlayerRepository mPlayerRepository;
+    private final ScoreRepository mScoreRepository;
+    private final PlayerActionRepository mPlayerActionRepository;
 
-    private LiveData<List<Name>> mNames;
-    private LiveData<List<Player>> mPlayers;
-    private LiveData<List<Score>> mScores;
-    private LiveData<List<PlayerAction>> mPlayerActions;
+    private final LiveData<List<Name>> mNames;
+    private final LiveData<List<Player>> mPlayers;
+    private final LiveData<List<Score>> mScores;
+    private final LiveData<List<PlayerAction>> mPlayerActions;
+    private final LiveData<List<PlayerWithScore>> mPlayerWithScore;
 
     /**
      * Gibt an, ob die Scores in der UI angezeigt werden.
      */
-    private MutableLiveData<Boolean> showScore = new MutableLiveData<>();
+    private boolean mShowScoreList = true;
+    private final MutableLiveData<Boolean> mShowScoreListLive = new MutableLiveData<>();
 
     /**
      * Die Zahl, die gerade eingegeben wird / wurde. Diese wird einem Spieler als Punktzahl der a
      * aktuellen Runde zugewiesen
      */
-    private MutableLiveData<Integer> currentScore = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mCurrentScore = new MutableLiveData<>();
+    private int mCurrentScoreInt = 0;
 
     /**
      * Indikator für einen Lonkclick auf einen Spieler X.
      * Wert zu Beginn ist -1.
      */
-    private MutableLiveData<Integer> longClickPlayer = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mLongClickPlayer = new MutableLiveData<>();
 
     /**
      * Spieler, der aktuell an der Reihe ist.
      */
-    private MutableLiveData<Integer> activePlayer = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mActivePlayer = new MutableLiveData<>();
+    private int mActivePlayerInt = 0;
 
     /**
      * Beschränkung auf eine Anzahl von Spielern von 2 bis x
      */
-    private MutableLiveData<Integer> playerLimit = new MutableLiveData<>();
+    private final MutableLiveData<Integer> mPlayerLimit = new MutableLiveData<>();
+    private int mPlayerLimitInt = 0;
 
     /**
      * Indikator für die Erlaubnis an Rotation der Spieler. (Darf nur vor
      * der ersten Runde geschehen)
      */
-    private MutableLiveData<Boolean> isSwappingAllowed = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> mIsSwappingAllowed = new MutableLiveData<>();
 
     /**
      * Indikator für das Zeigen der Score der Spieler (Endscore)
      */
-    private MutableLiveData<Boolean> isShowMainScore = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> isShowMainScoreAllowed = new MutableLiveData<>();
 
-    private SingleLiveEvent<Boolean> showEditNameDialog = new SingleLiveEvent<>();
-    private SingleLiveEvent<Boolean> showMenuDialog = new SingleLiveEvent<>();
+    /**
+     *
+     */
+    private final SingleLiveEvent<Boolean> mShowEditNameDialog = new SingleLiveEvent<>();
 
 
     /**
      * Die Zuordnung des Scores zur Datenbank. Hier wird der neue Wert eingefügt, in die Datenbank
      * geschickt und geupdatet.
      */
-    private Score editScore = new Score(0, 0);
+    private Score mModifiedScore = new Score(0, 0);
 
 
     /**
@@ -105,22 +110,22 @@ public class MainViewModel extends AndroidViewModel {
         mScoreRepository = new ScoreRepository(application);
         mPlayerActionRepository = new PlayerActionRepository(application);
 
-        mNames = mNameRepository.getAllNames();
-        mPlayers = mPlayerRepository.getAllPlayers();
-        mScores = mScoreRepository.getAllScores();
+
+
+        mNames = mNameRepository.getNamesList();
+        mPlayers = mPlayerRepository.getPlayers();
+        mScores = mScoreRepository.getScores();
         mPlayerActions = mPlayerActionRepository.getAllPlayerActions();
+        mPlayerWithScore = mPlayerRepository.getPlayerWithScore();
 
 
-        currentScore.setValue(0);
-        longClickPlayer.setValue(-1);
-        activePlayer.setValue(0);
-        showScore.setValue(false);
-        isShowMainScore.setValue(true);
-
-
-        Log.w(TAG, "MainViewModel: playerLimit wird zu Beginn auf 4 gesetzt");
+        setCurrentScore(0);
+        setLongClickPlayer(-1);
+        setIsShowMainScoreAllowed(true);
+        setShowScoreListLive(true);
+        setActivePlayer(0);
         setPlayerLimit(4);
-        isSwappingAllowed.setValue(false);
+        setSwap(false);
 
 
     }
@@ -129,40 +134,34 @@ public class MainViewModel extends AndroidViewModel {
     //<editor-fold desc="Getter">
 
 
-    public MutableLiveData<Boolean> getIsShowMainScore() {
-        return isShowMainScore;
+    public MutableLiveData<Boolean> getIsShowMainScoreAllowed() {
+        return isShowMainScoreAllowed;
     }
 
-    public MutableLiveData<Boolean> getShowScore() {
-        return showScore;
-    }
 
     public MutableLiveData<Integer> getCurrentScore() {
-        return currentScore;
+        return mCurrentScore;
     }
 
     public MutableLiveData<Integer> getActivePlayer() {
-        return activePlayer;
+        return mActivePlayer;
     }
 
     public MutableLiveData<Integer> getPlayerLimit() {
-        return playerLimit;
+        return mPlayerLimit;
     }
 
     public MutableLiveData<Integer> getLongClickPlayer() {
-        return longClickPlayer;
+        return mLongClickPlayer;
     }
 
     public SingleLiveEvent<Boolean> getShowEditNameDialog() {
-        return showEditNameDialog;
+        return mShowEditNameDialog;
     }
 
-    public SingleLiveEvent<Boolean> getShowMenuDialog() {
-        return showMenuDialog;
-    }
 
     public LiveData<List<Player>> getPlayerLimited() {
-        return Transformations.switchMap(playerLimit, limit -> Transformations.map(getPlayers(), list -> {
+        return Transformations.switchMap(mPlayerLimit, limit -> Transformations.map(getPlayers(), list -> {
                     int min = Math.min(limit, list.size());
                     return list.subList(0, min);
                 }
@@ -170,39 +169,74 @@ public class MainViewModel extends AndroidViewModel {
 
     }
 
-
-    public void setShowMenuDialog(Boolean showMenuDialog) {
-        this.showMenuDialog.setValue(showMenuDialog);
-
+    public LiveData<List<PlayerWithScore>> getPlayerWithScoreLimitedByPlayerCount() {
+        return Transformations.switchMap(mPlayerLimit, limit -> Transformations.map(getPlayerWithScore(), list -> {
+                    int min = Math.min(limit, list.size());
+                    return list.subList(0, min);
+                }
+        ));
     }
+
 
     private int getActivePlayerId() {
-        return getPlayers().getValue().get(activePlayer.getValue()).getId();
+
+        return getPlayerList().get(mActivePlayerInt).getPlayerId();
+    }
+
+    public boolean isShowScoreList() {
+        return mShowScoreList;
+    }
+
+    public MutableLiveData<Boolean> getShowScoreListLive() {
+        return mShowScoreListLive;
     }
     //</editor-fold>
+
+    //---------------------------------------------------------------------------------------------
 
     //<editor-fold desc="Setter">
 
 
-    public void setIsShowMainScore(Boolean showMainScore) {
-        this.isShowMainScore.setValue(showMainScore);
+    public void setShowScoreListLive(Boolean showScoreList) {
+        mShowScoreList = showScoreList;
+        mShowScoreListLive.setValue(mShowScoreList);
     }
 
-    public void setShowScore(Boolean showScore) {
-        this.showScore.setValue(showScore);
+    public void setIsShowMainScoreAllowed(Boolean showMainScore) {
+        this.isShowMainScoreAllowed.setValue(showMainScore);
     }
 
-    public void setEditScore(Score editScore) {
-        if (this.editScore.isSelected()) {
-            this.editScore.setSelected(false);
-            updateScore(this.editScore);
+
+    public void toggleShowScoreList() {
+        mShowScoreList = !mShowScoreList;
+        setShowScoreListLive(mShowScoreList);
+    }
+
+    public void setModifiedScore(Score modifiedScore) {
+
+        if (mModifiedScore.isSelected()) {
+
+            mModifiedScore.setSelected(false);
+            updateScore(mModifiedScore);
+            setInputMode(INPUTMODE_DEFAULT);
+
+            if (modifiedScore.getScoreId() != this.mModifiedScore.getScoreId()) {
+                mModifiedScore = modifiedScore;
+                mModifiedScore.setSelected(true);
+                updateScore(mModifiedScore);
+                setInputMode(INPUTMODE_EDIT_SCORE);
+
+            }
+
+        } else {
+
+            mModifiedScore = modifiedScore;
+            mModifiedScore.setSelected(true);
+            updateScore(mModifiedScore);
+
+            setInputMode(INPUTMODE_EDIT_SCORE);
+
         }
-
-        editScore.setSelected(true);
-        this.editScore = editScore;
-        updateScore(this.editScore);
-
-        setInputMode(INPUTMODE_EDIT_SCORE);
     }
 
     public void setInputMode(int inputMode) {
@@ -210,38 +244,41 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void setCurrentScore(int score) {
-        this.currentScore.setValue(score);
+        this.mCurrentScore.setValue(score);
+        mCurrentScoreInt = score;
     }
 
     public void setLongClickPlayer(int selectedPlayer) {
-        this.longClickPlayer.setValue(selectedPlayer);
+        this.mLongClickPlayer.setValue(selectedPlayer);
     }
 
     public void setActivePlayer(int activePlayer) {
-        this.activePlayer.setValue(activePlayer);
+
+        this.mActivePlayer.setValue(activePlayer);
+        mActivePlayerInt = activePlayer;
+
     }
 
     public void setPlayerLimit(int playerLimit) {
-        this.playerLimit.setValue(playerLimit);
+        this.mPlayerLimit.setValue(playerLimit);
+        this.mPlayerLimitInt = playerLimit;
     }
 
     public void setShowEditNameDialog() {
-        this.showEditNameDialog.setValue(true);
+        this.mShowEditNameDialog.setValue(true);
     }
 
     public void setPlayerName(int player, String name) {
-        List<Player> allplayer = getPlayers().getValue();
+
+        List<Player> allplayer = getPlayerList();
 
         if (allplayer != null && allplayer.size() > player) {
-            Log.d(TAG, "updatePlayer");
-
 
             Player tPlayer = allplayer.get(player);
             tPlayer.setName(name);
             updatePlayer(tPlayer);
 
         } else {
-            Log.d(TAG, "inserPlayer");
             Player newPlayer = new Player(name);
             insertPlayer(newPlayer);
 
@@ -249,115 +286,14 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void setSwap(boolean onOff) {
-        isSwappingAllowed.setValue(onOff);
+        mIsSwappingAllowed.setValue(onOff);
         // TODO: 10.08.2020 Swapbutton
     }
 
 
     //</editor-fold>
 
-    public void undoLastAction() {
-        Log.d(TAG, "undoLastAction");
-
-
-        PlayerAction playerAction = getPlayerActions().getValue().get(getPlayerActions().getValue().size() - 1);
-        if (playerAction.getScoreId() == -1) {
-            Score score = getScores().getValue().get(0);
-            deleteScore(score);
-        }
-
-    }
-
-    public void onClickSubmit() {
-
-        setSwap(false);
-        int score = getCurrentScore().getValue();
-        switch (inputMode) {
-            case INPUTMODE_EDIT_SCORE:
-
-                int oldValue = editScore.getScore();
-                int newValue = score;
-                int scoreDif = newValue - oldValue;
-
-                editScore.setScore(score);
-                editScore.setSelected(false);
-
-                insertPlayerAction(new PlayerAction(scoreDif, editScore.getPlayer(), editScore.getId()));
-                updateScore(editScore);
-
-                setInputMode(INPUTMODE_DEFAULT);
-                setCurrentScore(0);
-                break;
-
-            default:
-                //Score Speichern
-                int activePlayer = getActivePlayer().getValue();
-
-                insertPlayerAction(new PlayerAction(score, getActivePlayerId()));
-                insertScore(new Score(getActivePlayerId(), score));
-
-                //update Player Values
-                Player player = getPlayers().getValue().get(activePlayer);
-                player.setScore(player.getScore() + score);
-
-                updatePlayer(player);
-
-
-                //Spieler weiterschalten
-                if (activePlayer < getPlayerLimit().getValue() - 1) {
-                    activePlayer++;
-                } else {
-                    activePlayer = 0;
-                }
-
-
-                setCurrentScore(0);
-                setActivePlayer(activePlayer);
-        }
-
-
-    }
-
-    public void onClickDigit(int digit) {
-        int number;
-        number = getCurrentScore().getValue();
-        number = number * 10 + digit;
-        setCurrentScore(number);
-
-
-
-     /*   switch (inputMode) {
-            case INPUTMODE_EDIT_SCORE:
-                int score = getCurrentScore().getValue();
-                editScore.setScore(score);
-                updateScore(editScore);
-                break;
-
-            default:
-                setCurrentScore(number);
-                break;
-
-        }*/
-
-
-    }
-
-    public void onCLickQwirkle() {
-        setCurrentScore(currentScore.getValue() + 12);
-        // TODO: 02.10.2020 Qwirkle dem SPieler dazuaddieren
-    }
-
-    public void newGame() {
-        List<Player> players_temp = mPlayers.getValue();
-        for (Player player : players_temp) {
-            player.setScore(0);
-            updatePlayer(player);
-        }
-        setSwap(true);
-        setActivePlayer(0);
-        deleteAllScores();
-        deleteAllPlayerActions();
-    }
+    //---------------------------------------------------------------------------------------------
 
     //<editor-fold desc="Names (Repo)">
     public LiveData<List<Name>> getNames() {
@@ -404,6 +340,22 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<List<Player>> getPlayers() {
         return mPlayers;
     }
+
+    public LiveData<List<PlayerWithScore>> getPlayerWithScore() {
+        return mPlayerWithScore;
+    }
+
+    private List<Player> getPlayerList() {
+        return mPlayerRepository.getPlayerList();
+    }
+
+    public Player getPlayerById(int playerId) {
+        return mPlayerRepository.getPlayerById(playerId);
+    }
+
+    public List<Player> getAllPlayerOnce() {
+        return mPlayerRepository.getPlayerOnce();
+    }
     //</editor-fold>
 
     //<editor-fold desc="Scores (Repo)">
@@ -430,6 +382,10 @@ public class MainViewModel extends AndroidViewModel {
 
     }
 
+    private List<Score> getScoreList() {
+        return mScoreRepository.getScoreList();
+    }
+
 
     //</editor-fold>
 
@@ -437,6 +393,10 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<List<PlayerAction>> getPlayerActions() {
         return mPlayerActions;
+    }
+
+    public PlayerAction getLastPlayerAction() {
+        return mPlayerActionRepository.getLastPlayerAction();
     }
 
     public void insertPlayerAction(PlayerAction playerAction) {
@@ -447,15 +407,118 @@ public class MainViewModel extends AndroidViewModel {
         mPlayerActionRepository.update(playerAction);
 
     }
+
     public void deletePlayerAction(PlayerAction playerAction) {
         mPlayerActionRepository.delete(playerAction);
 
     }
+
     public void deleteAllPlayerActions() {
         mPlayerActionRepository.deleteAll();
 
     }
 
     //</editor-fold>
+
+
+    public void undoLastAction() {
+
+        if (mCurrentScoreInt != 0) {
+            setCurrentScore(0);
+            return;
+        }
+
+        if (inputMode == INPUTMODE_EDIT_SCORE) {
+            mModifiedScore.setSelected(false);
+            updateScore(mModifiedScore);
+            return;
+        }
+
+        PlayerAction playerAction = getLastPlayerAction();
+        if (playerAction.getScoreId() == -1) {
+            if (getScoreList().size() > 0) {
+                Score score = getScoreList().get(0);
+                setActivePlayer(score.getPlayer() - 1);
+                deleteScore(score);
+                deletePlayerAction(playerAction);
+            }
+        } else {
+            Score score = new Score(playerAction.getPlayerChanged(), playerAction.getValueToRestore());
+            score.setScoreId(playerAction.getScoreId());
+            updateScore(score);
+            deletePlayerAction(playerAction);
+        }
+    }
+
+    public void onClickSubmit() {
+
+        setSwap(false);
+        int score = mCurrentScoreInt;
+        switch (inputMode) {
+            case INPUTMODE_EDIT_SCORE:
+
+                //Store previous value for history
+                int oldValue = mModifiedScore.getScore();
+
+
+
+                mModifiedScore.setScore(score);     //set score-Value in temp
+                mModifiedScore.setSelected(false);  //deselect score
+
+                insertPlayerAction(new PlayerAction(oldValue, mModifiedScore.getPlayer(), mModifiedScore.getScoreId()));
+                updateScore(mModifiedScore);
+
+                setInputMode(INPUTMODE_DEFAULT);
+                setCurrentScore(0);
+                break;
+
+            default:
+                //Score Speichern
+                int activePlayer = mActivePlayerInt;
+
+                insertPlayerAction(new PlayerAction(score, getActivePlayerId()));
+                insertScore(new Score(getActivePlayerId(), score));
+
+
+                //Spieler weiterschalten
+                if (activePlayer < mPlayerLimitInt - 1) {
+                    activePlayer++;
+                } else {
+                    activePlayer = 0;
+                }
+
+                setCurrentScore(0);
+                setActivePlayer(activePlayer);
+        }
+
+
+    }
+
+    public void onClickDigit(int digit) {
+        int number;
+        number = mCurrentScoreInt;
+        number = number * 10 + digit;
+        setCurrentScore(number);
+
+
+    }
+
+    public void onCLickQwirkle() {
+        setCurrentScore(mCurrentScoreInt + 12);
+        Player player = getPlayerById(getActivePlayerId());
+        player.setQwirkle(player.getQwirkle() + 1);
+        updatePlayer(player);
+    }
+
+    public void newGame() {
+        List<Player> players_temp = getPlayerList();
+        for (Player player : players_temp) {
+            updatePlayer(player);
+        }
+        setSwap(true);
+        setActivePlayer(0);
+        deleteAllScores();
+        deleteAllPlayerActions();
+    }
 
 }

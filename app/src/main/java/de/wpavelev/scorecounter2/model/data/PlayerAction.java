@@ -17,7 +17,7 @@ public class PlayerAction {
     /**
      * Veränderung eines Wertes bei einem Spieler
      */
-    int mValueChange = 0;
+    int mValueToRestore = 0;
 
     /**
      * Spieler, dessen Wert verändert wird
@@ -31,23 +31,23 @@ public class PlayerAction {
 
 
     @Ignore
-    public PlayerAction(int valueChange, int playerChanged) {
-        mValueChange = valueChange;
+    public PlayerAction(int valueToRestore, int playerChanged) {
+        mValueToRestore = valueToRestore;
         mPlayerChanged = playerChanged;
     }
 
-    public PlayerAction(int valueChange, int playerChanged, int scoreId) {
-        mValueChange = valueChange;
+    public PlayerAction(int valueToRestore, int playerChanged, int scoreId) {
+        mValueToRestore = valueToRestore;
         mPlayerChanged = playerChanged;
         mScoreId = scoreId;
     }
 
-    public int getValueChange() {
-        return mValueChange;
+    public int getValueToRestore() {
+        return mValueToRestore;
     }
 
-    public void setValueChange(int valueChange) {
-        mValueChange = valueChange;
+    public void setValueToRestore(int valueToRestore) {
+        mValueToRestore = valueToRestore;
     }
 
     public int getPlayerChanged() {

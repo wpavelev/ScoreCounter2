@@ -1,5 +1,6 @@
 package de.wpavelev.scorecounter2.ui.fragments;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,10 +10,13 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.scorecounter2.R;
 import com.example.scorecounter2.databinding.FragmentPlayerViewBinding;
 
 import java.util.Objects;
@@ -26,13 +30,11 @@ import de.wpavelev.scorecounter2.viewmodels.MainViewModel;
 
 public class PlayerViewFragment extends Fragment{
 
-    private static final String TAG = "SC2: PlayerViewFragment";
 
+    private MainViewModel mMainViewModel;
+    private RecyclerView mRecyclerView;
 
-    private MainViewModel viewModel;
-    private RecyclerView recyclerView;
-
-    private PlayerViewAdapter adapter;
+    private PlayerViewAdapter mPlayerViewAdapter;
 
     public PlayerViewFragment() {
     }
@@ -46,7 +48,7 @@ public class PlayerViewFragment extends Fragment{
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         com.example.scorecounter2.databinding.FragmentPlayerViewBinding binding = FragmentPlayerViewBinding.inflate(inflater, container, false);
-        recyclerView = binding.playerViewRecycler;
+        mRecyclerView = binding.playerViewRecycler;
 
         return binding.getRoot();
 
@@ -57,35 +59,45 @@ public class PlayerViewFragment extends Fragment{
         super.onActivityCreated(savedInstanceState);
 
 
-        viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        mMainViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
 
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new PlayerViewAdapter(
-                getContext(),
-                getViewLifecycleOwner(),
-                viewModel.getPlayerLimited(),
-                viewModel.getScores(),
-                viewModel.getShowScore(),
-                viewModel.getIsShowMainScore());
+        mRecyclerView.setLayoutManager(layoutManager);
+        mPlayerViewAdapter = new PlayerViewAdapter(getContext());
 
-        adapter.setListener(
-                (v, position) -> viewModel.setActivePlayer(position),
+        mPlayerViewAdapter.setListener(
+                (v, position) -> mMainViewModel.setActivePlayer(position),
                 (v, position) -> showPlayerNamesDialog(position),
-                score -> viewModel.setEditScore(score));
+                score -> mMainViewModel.setModifiedScore(score));
 
+        mMainViewModel.getShowScoreListLive().observe(
+                getViewLifecycleOwner(),
+                aBoolean -> mPlayerViewAdapter.setMShowScoreList(aBoolean)
+        );
 
         //sagt dem Adapter, wie viele Spieler eingestellt sind
         //wichtig für die größe der Felder
-        viewModel.getPlayerLimit().observe(getViewLifecycleOwner(), integer -> adapter.setPlayerCount(integer));
+        mMainViewModel.getPlayerLimit().observe(
+                getViewLifecycleOwner(),
+                integer -> mPlayerViewAdapter.setPlayerCount(integer));
 
-        //sagt dem Adapter, welcher Spieler an der Reihe ist
-        viewModel.getActivePlayer().observe(getViewLifecycleOwner(), integer -> {
-            adapter.setActivePlayer(integer);
-            recyclerView.smoothScrollToPosition(integer);
-        });
-        recyclerView.setAdapter(adapter);
+
+        mMainViewModel.getPlayerWithScoreLimitedByPlayerCount().observe(
+                getViewLifecycleOwner(),
+                playerWithScores -> mPlayerViewAdapter.submitList(playerWithScores)
+        );
+
+        mMainViewModel.getIsShowMainScoreAllowed().observe(
+                getViewLifecycleOwner(),
+                aBoolean -> mPlayerViewAdapter.setShowMainScore(aBoolean));
+
+        mMainViewModel.getActivePlayer().observe(
+                getViewLifecycleOwner(),
+                integer -> mPlayerViewAdapter.setActivePlayer(integer)
+        );
+
+        mRecyclerView.setAdapter(mPlayerViewAdapter);
 
 
 
@@ -94,7 +106,9 @@ public class PlayerViewFragment extends Fragment{
     }
 
     private void  showPlayerNamesDialog(int playerPosition) {
-        NameListDialog dialog = new NameListDialog(new NameListDialog.onClickListener() {
+
+
+        NameListDialog dialog = new NameListDialog(new NameListDialog.OnClickListener() {
             @Override
             public void newName() {
                 addNameDialog(playerPosition);
@@ -102,29 +116,44 @@ public class PlayerViewFragment extends Fragment{
 
             @Override
             public void clickPlayer(Name name) {
-                Player player = Objects.requireNonNull(viewModel.getPlayers().getValue()).get(playerPosition);
+                Player player = Objects.requireNonNull(mMainViewModel.getPlayers().getValue()).get(playerPosition);
                 player.setName(name.getName());
-                viewModel.updatePlayer(player);
-                adapter.notifyDataSetChanged();
+                mMainViewModel.updatePlayer(player);
+                mPlayerViewAdapter.notifyDataSetChanged();
 
 
             }
+
+            @Override
+            public void editName(Name name) {
+                editNameDialog(name);
+            }
+
+            @Override
+            public void deleteName(Name name) {
+                mMainViewModel.deleteName(name);
+            }
         });
 
+
         dialog.show(getChildFragmentManager(), "longClickPlayerDialog");
-        Log.d(TAG, "showPlayerNamesDialog: ");
     }
+
+    private void editNameDialog(Name name) {
+        InsertNameDialog dialog = new InsertNameDialog(name, name1 -> mMainViewModel.updateName(name1));
+        dialog.show(getChildFragmentManager(), "EditNameDialog");
+    }
+
 
     private void addNameDialog(int playerPosition) {
         InsertNameDialog dialog = new InsertNameDialog(new Name(""), name -> {
-            viewModel.insertName(name);
-            Player player = Objects.requireNonNull(viewModel.getPlayers().getValue()).get(playerPosition);
+            mMainViewModel.insertName(name);
+            Player player = Objects.requireNonNull(mMainViewModel.getPlayers().getValue()).get(playerPosition);
             player.setName(name.getName());
-            viewModel.updatePlayer(player);
+            mMainViewModel.updatePlayer(player);
 
         });
         dialog.show(getChildFragmentManager(), "NameListDialog");
-        Log.d(TAG, "addNameDialog: ");
     }
 
 
