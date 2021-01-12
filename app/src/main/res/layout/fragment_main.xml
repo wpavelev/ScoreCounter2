@@ -50,7 +50,8 @@
             app:layout_constraintTop_toBottomOf="@+id/main_fragment_frame_player"
             app:maxImageSize="48dp"
             app:rippleColor="@color/colorAccent"
-            app:srcCompat="@drawable/arrow_down" />
+            app:srcCompat="@drawable/arrow_down"
+            android:contentDescription="@string/description_icon_show_hide_scores" />
 
         <FrameLayout
             android:id="@+id/main_fragment_frame_player"

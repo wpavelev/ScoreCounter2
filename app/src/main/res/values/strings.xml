@@ -1,12 +1,27 @@
 <resources>
-    <string name="app_name">ScoreCounter2</string>
+    <string name="app_name">Score counter</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="start_new_game">Neues Spiel starten?</string>
     <string name="more_player">mehr als 4</string>
-    <string name="key_showmainscore">KEY_SHOWMAINSCORE</string>
-    <string name="cancel">Cancel</string>
-    <string name="chart_dialog_title">Chart</string>
-    <string name="score_click_info">Longclick to edit</string>
+    <string name="key_showmainscore" translatable="false">KEY_SHOWMAINSCORE</string>
+    <string name="cancel">Zurück</string>
+    <string name="chart_dialog_title">Diagramm</string>
+    <string name="score_click_info">Lang drück um zu bearbeiten</string>
+    <string name="enter_your_name">Namen eingeben</string>
+    <string name="ok" translatable="false">OK</string>
+    <string name="desccription_icon_chart">Diagramm</string>
+    <string name="description_icon_help">Hilfe</string>
+    <string name="description_icon_new_game">Neues Spiel</string>
+    <string name="description_icon_player_count">Spieleranzahl</string>
+    <string name="description_icon_add_name">Namen hinzufügen</string>
+    <string name="description_icon_4_player">4 Spieler</string>
+    <string name="description_icon_2_player">2 Spieler</string>
+    <string name="description_icon_3_player">3 Spieler</string>
+    <string name="description_icon_show_hide_scores">Punkte anzeigen und schließen</string>
+    <string name="description_icon_edit_name">Namen ändern</string>
+    <string name="description_icon_delete_name">Namen löschen</string>
+    <string name="menu_new_game">Neues Spiel</string>
+    <string name="menu_show_main_score">Zeige Spielstände</string>
+    <string name="menu_player_count">Spieleranzahl</string>
+    <string name="menu_chart">Diagramm</string>
 </resources>

@@ -14,7 +14,13 @@
     <color name="inactive_player_2">#0F99CC00</color>
     <color name="inactive_player_3">#0F33B5E5</color>
 
+    <color name="bar_player_0">#4DFF4444</color>
+    <color name="bar_player_1">#4DFFBB33</color>
+    <color name="bar_player_2">#4D99CC00</color>
+    <color name="bar_player_3">#4D33B5E5</color>
+
     <color name="selected_player">#DD009A</color>
+    <color name="text_color">#6E6E6E</color>
 
     <color name="main_background">@android:color/white</color>
 
@@ -23,5 +29,7 @@
     <color name="transparent">@android:color/transparent</color>
 
     <color name="num_pad_button_background">@color/main_background</color>
+
+    <color name="black">@android:color/black</color>
 
 </resources>

@@ -70,11 +70,6 @@ public class MainViewModel extends AndroidViewModel {
     private final MutableLiveData<Integer> mPlayerLimit = new MutableLiveData<>();
     private int mPlayerLimitInt = 0;
 
-    /**
-     * Indikator für die Erlaubnis an Rotation der Spieler. (Darf nur vor
-     * der ersten Runde geschehen)
-     */
-    private final MutableLiveData<Boolean> mIsSwappingAllowed = new MutableLiveData<>();
 
     /**
      * Indikator für das Zeigen der Score der Spieler (Endscore)
@@ -125,7 +120,7 @@ public class MainViewModel extends AndroidViewModel {
         setShowScoreListLive(true);
         setActivePlayer(0);
         setPlayerLimit(4);
-        setSwap(false);
+
 
 
     }
@@ -284,12 +279,6 @@ public class MainViewModel extends AndroidViewModel {
 
         }
     }
-
-    public void setSwap(boolean onOff) {
-        mIsSwappingAllowed.setValue(onOff);
-        // TODO: 10.08.2020 Swapbutton
-    }
-
 
     //</editor-fold>
 
@@ -452,7 +441,6 @@ public class MainViewModel extends AndroidViewModel {
 
     public void onClickSubmit() {
 
-        setSwap(false);
         int score = mCurrentScoreInt;
         switch (inputMode) {
             case INPUTMODE_EDIT_SCORE:
@@ -515,7 +503,7 @@ public class MainViewModel extends AndroidViewModel {
         for (Player player : players_temp) {
             updatePlayer(player);
         }
-        setSwap(true);
+
         setActivePlayer(0);
         deleteAllScores();
         deleteAllPlayerActions();

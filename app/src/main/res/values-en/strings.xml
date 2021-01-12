@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Spielstandzähler</string>
+    <string name="start_new_game">Start a newgame?</string>
+    <string name="more_player">more than 4</string>
+    <string name="cancel">Cancel</string>
+    <string name="chart_dialog_title">Chart</string>
+    <string name="score_click_info">Longpress to edit</string>
+    <string name="enter_your_name">Enter your name</string>
+    <string name="desccription_icon_chart">Chart</string>
+    <string name="description_icon_help">Help</string>
+    <string name="description_icon_new_game">New game</string>
+    <string name="description_icon_player_count">Playernumber</string>
+    <string name="description_icon_add_name">Add a name</string>
+    <string name="description_icon_4_player">4 Player</string>
+    <string name="description_icon_2_player">2 Player</string>
+    <string name="description_icon_3_player">3 Player</string>
+    <string name="description_icon_show_hide_scores">Show and hide Scores</string>
+    <string name="description_icon_edit_name">Change the name</string>
+    <string name="description_icon_delete_name">Delete the name</string>
+    <string name="menu_new_game">New game</string>
+    <string name="menu_show_main_score">Show scores</string>
+    <string name="menu_player_count">Number of players</string>
+    <string name="menu_chart">Chart</string>
+</resources>

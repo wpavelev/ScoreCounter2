@@ -19,7 +19,7 @@
 
         <ImageButton
             android:id="@+id/swap"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:adjustViewBounds="false"
@@ -27,7 +27,7 @@
             android:contentDescription="Swap Player"
             android:padding="@dimen/num_pad_image_button_padding"
             android:scaleType="centerInside"
-            android:src="@drawable/swap_icon1"
+
             app2:layout_constraintBottom_toBottomOf="@+id/b7"
             app2:layout_constraintEnd_toEndOf="parent"
             app2:layout_constraintHorizontal_bias="0.5"
@@ -36,7 +36,7 @@
 
         <ImageButton
             android:id="@+id/backButton"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -53,7 +53,7 @@
 
         <ImageButton
             android:id="@+id/button"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
 
             android:layout_height="0dp"
@@ -73,7 +73,7 @@
 
         <Button
             android:id="@+id/quirkle"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -86,7 +86,7 @@
 
         <Button
             android:id="@+id/placeholderbutton1"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -97,7 +97,7 @@
 
         <Button
             android:id="@+id/placeholderbutton2"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -108,7 +108,7 @@
 
         <Button
             android:id="@+id/b0"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
 
             android:layout_height="0dp"
@@ -124,7 +124,7 @@
 
         <Button
             android:id="@+id/b8"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
 
             android:layout_height="0dp"
@@ -141,7 +141,7 @@
 
         <Button
             android:id="@+id/b2"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -156,7 +156,7 @@
 
         <Button
             android:id="@+id/b9"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_column="2"
@@ -172,7 +172,7 @@
 
         <Button
             android:id="@+id/b4"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -186,7 +186,7 @@
 
         <Button
             android:id="@+id/b6"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
 
@@ -201,7 +201,7 @@
 
         <Button
             android:id="@+id/b1"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -215,7 +215,7 @@
 
         <Button
             android:id="@+id/b7"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"
@@ -230,7 +230,7 @@
 
         <Button
             android:id="@+id/b5"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_column="1"
@@ -245,7 +245,7 @@
 
         <Button
             android:id="@+id/b3"
-            style="@android:style/Widget.DeviceDefault.Button.Borderless"
+            style="@style/NumpadButton"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@color/num_pad_button_background"

@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         Toolbar toolbar = binding.toolbar;
+        toolbar.setTitle("");
+        toolbar.setSubtitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
 
         int mainContainer = binding.mainActivityContainer.getId();
@@ -106,13 +108,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        mViewModel.getScores().observe(this, scores -> {
-            if (scores == null || scores.size() == 0) {
-                mViewModel.setSwap(true);
-            }
-
-        });
 
         mViewModel.getPlayerActions().observe(this, playerActions -> {
             if (playerActions.size() == 0) {

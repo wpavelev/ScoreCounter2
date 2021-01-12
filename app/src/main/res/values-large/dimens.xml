@@ -2,7 +2,7 @@
 <resources>
 
 
-    <dimen name="square_button_text_size">18sp</dimen>
-    <dimen name="score_text_size">24sp</dimen>
+    <dimen name="square_button_text_size">24sp</dimen>
+    <dimen name="score_text_size">32sp</dimen>
     <dimen name="num_pad_image_button_padding">8dp</dimen>
 </resources>

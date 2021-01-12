@@ -37,9 +37,6 @@ public class MainFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
 
-        //TODO: ConstraintSet Transitions:
-        //TODO https://developer.android.com/training/constraint-layout
-
 
         com.example.scorecounter2.databinding.FragmentMainBinding binding = FragmentMainBinding.inflate(inflater, container, false);
 

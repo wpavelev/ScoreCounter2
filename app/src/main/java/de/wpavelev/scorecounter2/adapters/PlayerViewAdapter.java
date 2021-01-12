@@ -30,6 +30,8 @@ import static com.example.scorecounter2.R.string.score_click_info;
 
 public class PlayerViewAdapter extends ListAdapter<PlayerWithScore, PlayerViewAdapter.MyViewHolder> {
 
+
+    private static final String TAG = "PlayerViewAdapter";
     public interface ClickListener {
 
         void onItemClick(View v, int position);
@@ -115,6 +117,7 @@ public class PlayerViewAdapter extends ListAdapter<PlayerWithScore, PlayerViewAd
 
     public void setPlayerCount(int playerCount) {
         this.mPlayerCount = playerCount;
+
     }
 
 
@@ -187,11 +190,9 @@ public class PlayerViewAdapter extends ListAdapter<PlayerWithScore, PlayerViewAd
 
             this.viewHolderBinding = binding;
 
-
             layout = binding.itemPlayerViewRecyclerView;
-            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (mPlayerCount) - 40);
-            layout.setMaxWidth(layoutWidth);
-            layout.setMinWidth(layoutWidth);
+
+            setUpLayout(mPlayerCount);
 
 
             RecyclerView recyclerPlayerScore = binding.itemPlayerViewRecyclerPlayerScore;
@@ -216,7 +217,6 @@ public class PlayerViewAdapter extends ListAdapter<PlayerWithScore, PlayerViewAd
 
             recyclerPlayerScore.setAdapter(mScoreListAdapter);
 
-            // TODO: 29.12.2020
 
             binding.setShowScores(true);
 
@@ -229,6 +229,14 @@ public class PlayerViewAdapter extends ListAdapter<PlayerWithScore, PlayerViewAd
                 itemView.setOnLongClickListener(this);
             }
 
+
+        }
+
+        public void setUpLayout(int playerCount) {
+
+            int layoutWidth = (int) Math.round(((double) DisplayUtil.getDisplayWidthPx()) / (playerCount) - 40);
+            layout.setMaxWidth(layoutWidth);
+            layout.setMinWidth(layoutWidth);
 
         }
 

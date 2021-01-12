@@ -19,6 +19,7 @@ public class ScoreViewFragment extends Fragment {
     FragmentScoreViewBinding mBinding;
 
 
+
     public ScoreViewFragment() {
 
     }

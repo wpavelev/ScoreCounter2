@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/main_background"
@@ -22,7 +20,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageButton2"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/new_game_icon" />
+        app:srcCompat="@drawable/new_game_icon"
+        android:contentDescription="@string/description_icon_new_game" />
 
     <ImageButton
         android:id="@+id/imageButton2"
@@ -36,7 +35,8 @@
         app:layout_constraintStart_toEndOf="@+id/imageButton"
         app:layout_constraintTop_toTopOf="@+id/imageButton4"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/player" />
+        app:srcCompat="@drawable/player"
+        android:contentDescription="@string/description_icon_player_count" />
 
     <ImageButton
         android:id="@+id/imageButton3"
@@ -50,7 +50,8 @@
         app:layout_constraintStart_toEndOf="@+id/imageButton4"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/stats" />
+        app:srcCompat="@drawable/stats"
+        android:contentDescription="@string/desccription_icon_chart" />
 
     <ImageButton
         android:id="@+id/imageButton4"
@@ -65,5 +66,6 @@
         app:layout_constraintStart_toEndOf="@+id/imageButton2"
         app:layout_constraintTop_toTopOf="@+id/imageButton3"
         app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/list" />
+        app:srcCompat="@drawable/list"
+        android:contentDescription="@string/description_icon_help" />
 </androidx.constraintlayout.widget.ConstraintLayout>
